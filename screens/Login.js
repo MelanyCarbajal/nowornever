@@ -51,9 +51,9 @@ export default function Login({ setScreen, setUser, users }) {
       {mensaje !== "" && (
         <View style={[
           styles.toast,
-          { backgroundColor: tipo === "error" ? "#EF4444" : "#22C55E" }
+          { backgroundColor: tipo === "error" ? "#EF4444" : "#10B981" }
         ]}>
-          <Text style={{ color: "white", fontWeight: "bold" }}>
+          <Text style={styles.toastText}>
             {mensaje}
           </Text>
         </View>
@@ -61,13 +61,14 @@ export default function Login({ setScreen, setUser, users }) {
 
       <View style={styles.card}>
 
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.title}>Iniciar sesión</Text>
 
         <TextInput
           placeholder="Usuario"
           value={nombre}
           onChangeText={setNombre}
           style={styles.input}
+          placeholderTextColor="#9CA3AF"
         />
 
         <TextInput
@@ -76,6 +77,7 @@ export default function Login({ setScreen, setUser, users }) {
           value={password}
           onChangeText={setPassword}
           style={styles.input}
+          placeholderTextColor="#9CA3AF"
         />
 
         <Button title="Entrar" onPress={handleLogin} />
@@ -95,35 +97,45 @@ export default function Login({ setScreen, setUser, users }) {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: "#F5F3FF",
+    backgroundColor: "#F9FAFB", 
     justifyContent: "center",
     padding: 20
   },
 
   card: {
-    backgroundColor: "white",
+    backgroundColor: "#FFFFFF",
     padding: 24,
-    borderRadius: 20
+    borderRadius: 20,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3
   },
 
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6D28D9",
-    marginBottom: 10
+    color: "#111827", 
+    marginBottom: 20,
+    textAlign: "center"
   },
 
   input: {
-    backgroundColor: "#F5F3FF",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB", 
     padding: 14,
     borderRadius: 12,
-    marginBottom: 12
+    marginBottom: 12,
+    color: "#111827"
   },
 
   link: {
     marginTop: 15,
     textAlign: "center",
-    color: "#6D28D9"
+    color: "#2563EB", 
+    fontWeight: "500"
   },
 
   toast: {
@@ -135,5 +147,10 @@ const styles = {
     borderRadius: 10,
     alignItems: "center",
     zIndex: 999
+  },
+
+  toastText: {
+    color: "white",
+    fontWeight: "bold"
   }
 };

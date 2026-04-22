@@ -30,11 +30,6 @@ export default function Registro({ setScreen, users, setUsers }) {
       return;
     }
 
-    if (!correo.includes("@")) {
-      showMessage("El correo debe contener @", "error");
-      return;
-    }
-
     if (!validarEmail(correo)) {
       showMessage("Correo inválido", "error");
       return;
@@ -66,9 +61,9 @@ export default function Registro({ setScreen, users, setUsers }) {
       {mensaje !== "" && (
         <View style={[
           styles.toast,
-          { backgroundColor: tipo === "error" ? "#EF4444" : "#22C55E" }
+          { backgroundColor: tipo === "error" ? "#EF4444" : "#10B981" }
         ]}>
-          <Text style={{ color: "white", fontWeight: "bold" }}>
+          <Text style={styles.toastText}>
             {mensaje}
           </Text>
         </View>
@@ -76,13 +71,14 @@ export default function Registro({ setScreen, users, setUsers }) {
 
       <View style={styles.card}>
 
-        <Text style={styles.title}>Registro</Text>
+        <Text style={styles.title}>Crear cuenta</Text>
 
         <TextInput
           placeholder="Usuario"
           value={nombre}
           onChangeText={setNombre}
           style={styles.input}
+          placeholderTextColor="#9CA3AF"
         />
 
         <TextInput
@@ -90,6 +86,8 @@ export default function Registro({ setScreen, users, setUsers }) {
           value={correo}
           onChangeText={setCorreo}
           style={styles.input}
+          placeholderTextColor="#9CA3AF"
+          keyboardType="email-address"
         />
 
         <TextInput
@@ -98,6 +96,7 @@ export default function Registro({ setScreen, users, setUsers }) {
           value={password}
           onChangeText={setPassword}
           style={styles.input}
+          placeholderTextColor="#9CA3AF"
         />
 
         <Button title="Crear cuenta" onPress={handleRegister} />
@@ -117,35 +116,45 @@ export default function Registro({ setScreen, users, setUsers }) {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: "#F5F3FF",
+    backgroundColor: "#F9FAFB",
     justifyContent: "center",
     padding: 20
   },
 
   card: {
-    backgroundColor: "white",
+    backgroundColor: "#FFFFFF",
     padding: 24,
-    borderRadius: 20
+    borderRadius: 20,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3
   },
 
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6D28D9",
-    marginBottom: 10
+    color: "#111827",
+    marginBottom: 20,
+    textAlign: "center"
   },
 
   input: {
-    backgroundColor: "#F5F3FF",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
     padding: 14,
     borderRadius: 12,
-    marginBottom: 12
+    marginBottom: 12,
+    color: "#111827"
   },
 
   link: {
     marginTop: 15,
     textAlign: "center",
-    color: "#6D28D9"
+    color: "#2563EB",
+    fontWeight: "500"
   },
 
   toast: {
@@ -157,5 +166,10 @@ const styles = {
     borderRadius: 10,
     alignItems: "center",
     zIndex: 999
+  },
+
+  toastText: {
+    color: "white",
+    fontWeight: "bold"
   }
 };

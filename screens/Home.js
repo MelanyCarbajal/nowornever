@@ -5,26 +5,25 @@ export default function Home({ user, setScreen }) {
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>
-        Dashboard
-      </Text>
+      <Text style={styles.title}>Dashboard</Text>
 
       <Text style={styles.subtitle}>
         Hola, {user?.nombre || "Usuario"} 👋
       </Text>
 
-      {/* Tarjeta principal: Crear simulación */}
-      <TouchableOpacity activeOpacity={0.8}>
+      {/* Tarjeta principal */}
+      <TouchableOpacity activeOpacity={0.85}>
         <View style={styles.bigCard}>
           <Text style={styles.bigIcon}>＋</Text>
           <Text style={styles.bigTitle}>Nueva simulación</Text>
-          <Text style={styles.bigSub}>Define tu meta y parámetros</Text>
+          <Text style={styles.bigSub}>
+            Define tu meta y predice tu resultado
+          </Text>
         </View>
       </TouchableOpacity>
 
-      {/* Grid de tarjetas */}
+      {/* Grid */}
       <View style={styles.grid}>
-
         <PressCard icon="📊" title="Estadísticas" />
         <PressCard icon="📅" title="Historial" />
         <PressCard icon="🔔" title="Notificaciones" />
@@ -37,7 +36,6 @@ export default function Home({ user, setScreen }) {
           <Text style={styles.cardTitle}>Perfil</Text>
           <Text style={styles.cardSub}>Ver cuenta</Text>
         </TouchableOpacity>
-
       </View>
 
     </View>
@@ -57,12 +55,12 @@ function PressCard({ icon, title }) {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: "#F3E8FF",
+    backgroundColor: "#F9FAFB",
     padding: 20
   },
 
   title: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: "bold",
     color: "#111827"
   },
@@ -73,26 +71,34 @@ const styles = {
   },
 
   bigCard: {
-    backgroundColor: "#6D28D9",
-    padding: 20,
-    borderRadius: 18,
+    backgroundColor: "#2563EB", 
+    padding: 24,
+    borderRadius: 20,
     alignItems: "center",
-    marginBottom: 20
+    marginBottom: 20,
+
+    shadowColor: "#2563EB",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5
   },
 
   bigIcon: {
-    fontSize: 32,
-    color: "white"
+    fontSize: 34,
+    color: "white",
+    marginBottom: 5
   },
 
   bigTitle: {
     color: "white",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    fontSize: 16
   },
 
   bigSub: {
-    color: "#E9D5FF",
-    fontSize: 12
+    color: "#DBEAFE",
+    fontSize: 12,
+    textAlign: "center"
   },
 
   grid: {
@@ -103,11 +109,16 @@ const styles = {
 
   card: {
     width: "48%",
-    backgroundColor: "white",
+    backgroundColor: "#FFFFFF",
     padding: 18,
     borderRadius: 16,
     marginBottom: 15,
-    alignItems: "center"
+    alignItems: "center",
+
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2
   },
 
   cardIcon: {

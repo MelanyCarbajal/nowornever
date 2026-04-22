@@ -1,21 +1,23 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import Button from "../components/Button";
 
 export default function Perfil({ setScreen }) {
   return (
     <View style={styles.container}>
-
       <View style={styles.card}>
+
+        <Image
+          source={require("../assets/6073873.png")}
+          style={styles.profileImage}
+        />
 
         <Text style={styles.title}>
           Perfil del usuario
         </Text>
 
-        {/* Información del usuario */}
         <Text style={styles.text}>
-          Categoría de procrastinador: “Perfeccionista”.
-          No empieza una tarea porque siente que no está listo o no será suficientemente bueno.
+          Categoría: “Perfeccionista”
         </Text>
 
         <Text style={styles.text}>
@@ -37,23 +39,20 @@ export default function Perfil({ setScreen }) {
           <Text style={styles.cardTitle}>Logros</Text>
         </View>
 
-        {/* Botón */}
         <Button
           title="Volver al Home"
           onPress={() => setScreen("home")}
         />
 
       </View>
-
     </View>
   );
 }
 
-
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: "#F3E8FF", 
+    backgroundColor: "#F9FAFB",
     justifyContent: "center",
     alignItems: "center",
     padding: 20
@@ -65,33 +64,45 @@ const styles = {
     borderRadius: 20,
     width: "100%",
 
-    shadowColor: "#6D28D9",
-    shadowOpacity: 0.12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
     shadowRadius: 10,
-    elevation: 4
+    elevation: 3
+  },
+
+  profileImage: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    alignSelf: "center",
+    marginBottom: 15,
+    borderWidth: 3,               
+    borderColor: "#2563EB"        
   },
 
   title: {
     fontSize: 22,
-    color: "#6D28D9",
+    color: "#111827",
     fontWeight: "bold",
-    marginBottom: 12
+    marginBottom: 12,
+    textAlign: "center"
   },
 
   text: {
     color: "#6B7280",
-    marginBottom: 5
+    marginBottom: 6,
+    textAlign: "center"
   },
 
   miniCard: {
-    backgroundColor: "#F5F3FF",
+    backgroundColor: "#FFFFFF",
     padding: 14,
     borderRadius: 14,
     marginTop: 10,
     alignItems: "center",
     width: "100%",
     borderWidth: 1,
-    borderColor: "#E9D5FF"
+    borderColor: "#E5E7EB" 
   },
 
   icon: {
@@ -100,7 +111,7 @@ const styles = {
   },
 
   cardTitle: {
-    color: "#6D28D9",
+    color: "#2563EB", 
     fontWeight: "bold"
   }
 };

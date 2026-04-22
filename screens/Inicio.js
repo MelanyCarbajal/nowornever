@@ -37,7 +37,7 @@ export default function Inicio({ setScreen }) {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: "#F3E8FF", 
+    backgroundColor: "#F9FAFB", 
     justifyContent: "center",
     alignItems: "center",
     padding: 20
@@ -50,15 +50,15 @@ const styles = {
     width: "100%",
     maxWidth: 340,
 
-    shadowColor: "#6D28D9",
-    shadowOpacity: 0.15,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
     shadowRadius: 10,
-    elevation: 5
+    elevation: 3
   },
 
   title: {
-    fontSize: 22,
-    color: "#6D28D9",
+    fontSize: 24,
+    color: "#111827",
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center"
@@ -69,4 +69,5 @@ const styles = {
     marginBottom: 20,
     textAlign: "center"
   }
+
 };
