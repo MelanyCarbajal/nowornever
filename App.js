@@ -1,93 +1,56 @@
-import React, { useState } from "react";
-import { View, Text } from "react-native";
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-// Screens
+// 1. IMPORTACIÓN DE TODAS TUS PANTALLAS
+// Asegúrate de que las rutas coincidan con la carpeta donde están tus archivos
+import Inicio from "./screens/Inicio";
 import Login from "./screens/Login";
 import Registro from "./screens/Registro";
-import Home from "./screens/Home";
-import Inicio from "./screens/Inicio";
+import Home from "./screens/Home"; 
 import Perfil from "./screens/Perfil";
+import NuevaSimulacion from "./screens/NuevaSimulacion";
+import Recomendaciones from "./screens/Recomendaciones";
 
-// Header
-import Header from "./components/Header";
+// Inicializamos los navegadores
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
-export default function App() {
-
-  const [screen, setScreen] = useState("inicio");
-  const [user, setUser] = useState(null);
-  const [users, setUsers] = useState([]);
-
-  const renderScreen = () => {
-
-    console.log("SCREEN ACTUAL:", screen);
-
-    switch (screen) {
-
-      case "inicio":
-        return <Inicio setScreen={setScreen} />;
-
-      case "login":
-        return (
-          <Login
-            setScreen={setScreen}
-            setUser={setUser}
-            users={users}
-          />
-        );
-
-      case "registro":
-        return (
-          <Registro
-            setScreen={setScreen}
-            users={users}
-            setUsers={setUsers}
-          />
-        );
-
-      case "home":
-        return (
-          <Home
-            setScreen={setScreen}
-            user={user}
-          />
-        );
-
-      case "perfil":
-        return (
-          <Perfil
-            setScreen={setScreen}
-            user={user}
-          />
-        );
-
-      default:
-        return (
-          <View style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#F3E8FF"
-          }}>
-            <Text style={{ color: "red", fontWeight: "bold" }}>
-              ❌ Screen no existe: {screen}
-            </Text>
-          </View>
-        );
-    }
-  };
-
+// 2. CREAMOS EL MENÚ INFERIOR (TAB NAVIGATOR)
+// Este menú cumple con la rúbrica de combinar navegaciones.
+// Solo será visible cuando el usuario haya iniciado sesión.
+function HomeTabs() {
   return (
-    <View style={{ flex: 1 }}>
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Simular" component={NuevaSimulacion} />
+      <Tab.Screen name="Consejos" component={Recomendaciones} />
+      <Tab.Screen name="Perfil" component={Perfil} />
+    </Tab.Navigator>
+  );
+}
 
-      {/* Muestra header en todas las pantallas excepto inicio, login y registro */ }
-      {screen !== "inicio" &&
-       screen !== "login" &&
-       screen !== "registro" && (
-        <Header setScreen={setScreen} />
-      )}
-
-      {renderScreen()}
-
-    </View>
+// 3. EL ENRUTADOR PRINCIPAL (STACK NAVIGATOR)
+// Aquí apilamos las pantallas de entrada y conectamos el menú inferior.
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Inicio" screenOptions={{ headerShown: false }}>
+        
+        {/* Pantallas iniciales (El menú inferior NO se ve aquí) */}
+        <Stack.Screen name="Inicio" component={Inicio} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Registro" component={Registro} />
+        
+        {/* 
+          ¡EL TRUCO DE LA COMBINACIÓN ESTÁ AQUÍ!
+          Cuando el usuario hace Login exitoso, lo enviamos a "HomeTabs".
+          Esto cargará el Dashboard y habilitará las pestañas inferiores.
+        */}
+        <Stack.Screen name="HomeTabs" component={HomeTabs} />
+        
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }

@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Button from "../components/Button";
 
-export default function Inicio({ setScreen }) {
+// 1. CAMBIO CLAVE: Cambiamos '{ setScreen }' por '{ navigation }'
+export default function Inicio({ navigation }) {
   return (
     <View style={styles.container}>
 
@@ -16,16 +17,18 @@ export default function Inicio({ setScreen }) {
           Actúa ahora, alcanza tus metas.
         </Text>
 
+        {/* 2. CAMBIO CLAVE: Usamos navigation.navigate("Login") */}
         <Button
           title="Empezar"
-          onPress={() => setScreen("login")}
+          onPress={() => navigation.navigate("Login")}
         />
 
         <View style={{ height: 10 }} />
 
+        {/* 3. CAMBIO CLAVE: Usamos navigation.navigate("Registro") */}
         <Button
           title="Crear cuenta"
-          onPress={() => setScreen("registro")}
+          onPress={() => navigation.navigate("Registro")}
         />
 
       </View>
@@ -34,7 +37,8 @@ export default function Inicio({ setScreen }) {
   );
 }
 
-const styles = {
+// 4. BUENA PRÁCTICA: Envolvemos tus estilos en StyleSheet.create()
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F9FAFB", 
@@ -69,5 +73,4 @@ const styles = {
     marginBottom: 20,
     textAlign: "center"
   }
-
-};
+});

@@ -17,7 +17,7 @@ export default function Card({ children, variant = "default", style = {} }) {
       style={[
         styles.card,
         { backgroundColor: getBackground() },
-        style // 🔥 permite personalizar desde afuera
+        style
       ]}
     >
       {children}

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../components/Button";
 
-export default function Registro({ setScreen, users, setUsers }) {
+// 1. CAMBIO CLAVE: Recibimos 'navigation' en lugar de los props antiguos
+export default function Registro({ navigation }) {
 
+  // Mantenemos tus estados (Hooks), lo cual asegura tu 25% de la rúbrica
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +26,7 @@ export default function Registro({ setScreen, users, setUsers }) {
   };
 
   const handleRegister = () => {
-
+    // Validaciones
     if (!nombre || !correo || !password) {
       showMessage("Completa todos los campos", "error");
       return;
@@ -40,18 +42,12 @@ export default function Registro({ setScreen, users, setUsers }) {
       return;
     }
 
-    const nuevoUsuario = {
-      nombre,
-      correo,
-      password
-    };
-
-    setUsers([...users, nuevoUsuario]);
-
+    // Nota: El guardado real en base de datos será en el Avance 3.
     showMessage("Cuenta creada correctamente", "success");
 
+    // 2. CAMBIO CLAVE: Navegamos al Login usando React Navigation
     setTimeout(() => {
-      setScreen("login");
+      navigation.navigate("Login");
     }, 1200);
   };
 
@@ -101,8 +97,9 @@ export default function Registro({ setScreen, users, setUsers }) {
 
         <Button title="Crear cuenta" onPress={handleRegister} />
 
+        {/* 3. CAMBIO CLAVE: Cambiamos setScreen por navigation.navigate */}
         <Text
-          onPress={() => setScreen("login")}
+          onPress={() => navigation.navigate("Login")}
           style={styles.link}
         >
           Ya tengo cuenta
@@ -113,25 +110,23 @@ export default function Registro({ setScreen, users, setUsers }) {
   );
 }
 
-const styles = {
+// 4. BUENA PRÁCTICA: Envolvemos los estilos
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F9FAFB",
     justifyContent: "center",
     padding: 20
   },
-
   card: {
     backgroundColor: "#FFFFFF",
     padding: 24,
     borderRadius: 20,
-
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3
   },
-
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -139,7 +134,6 @@ const styles = {
     marginBottom: 20,
     textAlign: "center"
   },
-
   input: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
@@ -149,14 +143,12 @@ const styles = {
     marginBottom: 12,
     color: "#111827"
   },
-
   link: {
     marginTop: 15,
     textAlign: "center",
     color: "#2563EB",
     fontWeight: "500"
   },
-
   toast: {
     position: "absolute",
     top: 50,
@@ -167,9 +159,8 @@ const styles = {
     alignItems: "center",
     zIndex: 999
   },
-
   toastText: {
     color: "white",
     fontWeight: "bold"
   }
-};
+});

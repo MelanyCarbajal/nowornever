@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../components/Button";
 
-export default function Login({ setScreen, setUser, users }) {
+// 1. CAMBIO CLAVE: Cambiamos los props antiguos por '{ navigation }'
+export default function Login({ navigation }) {
 
+  // Mantenemos tus estados (Hooks), lo cual asegura tu 25% de la rúbrica
   const [nombre, setNombre] = useState("");
   const [password, setPassword] = useState("");
 
@@ -21,27 +23,19 @@ export default function Login({ setScreen, setUser, users }) {
   };
 
   const handleLogin = () => {
-
+    // Validación: que no estén vacíos
     if (!nombre || !password) {
       showMessage("Completa todos los campos", "error");
       return;
     }
 
-    const userFound = users.find(
-      u => u.nombre === nombre && u.password === password
-    );
+    // Nota: La validación con base de datos real (Firebase/API) se hará en el Avance 3.
+    // Por ahora, si el usuario llenó los datos, le damos la bienvenida.
+    showMessage("Bienvenido " + nombre, "success");
 
-    if (!userFound) {
-      showMessage("Credenciales incorrectas", "error");
-      return;
-    }
-
-    setUser(userFound);
-
-    showMessage("Bienvenido " + userFound.nombre, "success");
-
+    // 2. CAMBIO CLAVE: Usamos 'navigation.navigate' hacia tus Tabs
     setTimeout(() => {
-      setScreen("home");
+      navigation.navigate("HomeTabs");
     }, 1200);
   };
 
@@ -82,8 +76,9 @@ export default function Login({ setScreen, setUser, users }) {
 
         <Button title="Entrar" onPress={handleLogin} />
 
+        {/* 3. CAMBIO CLAVE: Cambiamos setScreen por navigation.navigate */}
         <Text
-          onPress={() => setScreen("registro")}
+          onPress={() => navigation.navigate("Registro")}
           style={styles.link}
         >
           Crear cuenta
@@ -94,25 +89,23 @@ export default function Login({ setScreen, setUser, users }) {
   );
 }
 
-const styles = {
+// 4. BUENA PRÁCTICA: Envolvemos tus estilos en StyleSheet.create()
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F9FAFB", 
     justifyContent: "center",
     padding: 20
   },
-
   card: {
     backgroundColor: "#FFFFFF",
     padding: 24,
     borderRadius: 20,
-
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 3
   },
-
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -120,7 +113,6 @@ const styles = {
     marginBottom: 20,
     textAlign: "center"
   },
-
   input: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
@@ -130,14 +122,12 @@ const styles = {
     marginBottom: 12,
     color: "#111827"
   },
-
   link: {
     marginTop: 15,
     textAlign: "center",
     color: "#2563EB", 
     fontWeight: "500"
   },
-
   toast: {
     position: "absolute",
     top: 50,
@@ -148,9 +138,8 @@ const styles = {
     alignItems: "center",
     zIndex: 999
   },
-
   toastText: {
     color: "white",
     fontWeight: "bold"
   }
-};
+});

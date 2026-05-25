@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 import Button from "../components/Button";
 
-export default function Perfil({ setScreen }) {
+// 1. CAMBIO CLAVE: Cambiamos '{ setScreen }' por '{ navigation }'
+export default function Perfil({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
@@ -39,9 +40,10 @@ export default function Perfil({ setScreen }) {
           <Text style={styles.cardTitle}>Logros</Text>
         </View>
 
+        {/* 2. CAMBIO CLAVE: Usamos navigation.navigate("Home") para volver a la pestaña principal */}
         <Button
           title="Volver al Home"
-          onPress={() => setScreen("home")}
+          onPress={() => navigation.navigate("Home")}
         />
 
       </View>
@@ -49,7 +51,8 @@ export default function Perfil({ setScreen }) {
   );
 }
 
-const styles = {
+// 3. BUENA PRÁCTICA: Envolvemos tus estilos en StyleSheet.create()
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F9FAFB",
@@ -114,4 +117,4 @@ const styles = {
     color: "#2563EB", 
     fontWeight: "bold"
   }
-};
+});
