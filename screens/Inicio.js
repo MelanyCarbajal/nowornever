@@ -1,76 +1,100 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import Button from "../components/Button";
 
-// 1. CAMBIO CLAVE: Cambiamos '{ setScreen }' por '{ navigation }'
 export default function Inicio({ navigation }) {
   return (
     <View style={styles.container}>
-
       <View style={styles.card}>
-
-        <Text style={styles.title}>
-          Bienvenido a NOWORNEVER
-        </Text>
-
-        <Text style={styles.subtitle}>
-          Actúa ahora, alcanza tus metas.
-        </Text>
-
-        {/* 2. CAMBIO CLAVE: Usamos navigation.navigate("Login") */}
-        <Button
-          title="Empezar"
-          onPress={() => navigation.navigate("Login")}
+        <Image
+          source={require("../assets/logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
         />
 
-        <View style={{ height: 10 }} />
+        <Text style={styles.title}>Bienvenido a NOWORNEVER</Text>
 
-        {/* 3. CAMBIO CLAVE: Usamos navigation.navigate("Registro") */}
+        <Text style={styles.subtitle}>
+          Actúa ahora y evita llegar al punto de no retorno.
+        </Text>
+
+        <Button title="Empezar" onPress={() => navigation.navigate("Login")} />
+
+        <View style={styles.spacing} />
+
         <Button
           title="Crear cuenta"
           onPress={() => navigation.navigate("Registro")}
         />
-
       </View>
-
     </View>
   );
 }
 
-// 4. BUENA PRÁCTICA: Envolvemos tus estilos en StyleSheet.create()
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB", 
+
     justifyContent: "center",
     alignItems: "center",
-    padding: 20
+
+    paddingHorizontal: 20,
+
+    backgroundColor: "#F3F4F6",
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
-    padding: 26,
-    borderRadius: 20,
     width: "100%",
-    maxWidth: 340,
+    maxWidth: 360,
+
+    backgroundColor: "#FFFFFF",
+
+    paddingVertical: 32,
+    paddingHorizontal: 24,
+
+    borderRadius: 24,
 
     shadowColor: "#000",
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.06,
     shadowRadius: 10,
-    elevation: 3
+
+    elevation: 4,
+  },
+
+  logo: {
+    width: 90,
+    height: 90,
+
+    alignSelf: "center",
+
+    marginBottom: 18,
   },
 
   title: {
-    fontSize: 24,
-    color: "#111827",
+    fontSize: 26,
+
     fontWeight: "bold",
+
+    color: "#111827",
+
+    textAlign: "center",
+
     marginBottom: 10,
-    textAlign: "center"
   },
 
   subtitle: {
+    fontSize: 15,
+
     color: "#6B7280",
-    marginBottom: 20,
-    textAlign: "center"
-  }
+
+    textAlign: "center",
+
+    lineHeight: 22,
+
+    marginBottom: 28,
+  },
+
+  spacing: {
+    height: 12,
+  },
 });

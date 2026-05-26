@@ -1,51 +1,55 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import {  View, Text, TextInput, TouchableOpacity, StyleSheet,} from "react-native";
 import Button from "../components/Button";
 
-// 1. CAMBIO CLAVE: Recibimos 'navigation' en lugar de los props antiguos
 export default function Registro({ navigation }) {
 
-  // Mantenemos tus estados (Hooks), lo cual asegura tu 25% de la rúbrica
-  const [nombre, setNombre] = useState("");
-  const [correo, setCorreo] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
-  const [mensaje, setMensaje] = useState("");
-  const [tipo, setTipo] = useState("");
+  const validateEmail = (emailText) => {
+    return /\S+@\S+\.\S+/.test(emailText);
+  };
 
-  const validarEmail = (email) => /\S+@\S+\.\S+/.test(email);
+
 
   const showMessage = (text, type = "error") => {
-    setMensaje(text);
-    setTipo(type);
+    setMessage(text);
+
+    setMessageType(type);
 
     setTimeout(() => {
-      setMensaje("");
-      setTipo("");
+      setMessage("");
+      setMessageType("");
     }, 2000);
   };
 
+
+
   const handleRegister = () => {
-    // Validaciones
-    if (!nombre || !correo || !password) {
+    if (!username.trim() || !email.trim() || !password.trim()) {
       showMessage("Completa todos los campos", "error");
+
       return;
     }
 
-    if (!validarEmail(correo)) {
-      showMessage("Correo inválido", "error");
+    if (!validateEmail(email)) {
+      showMessage("Correo electrónico inválido", "error");
+
       return;
     }
 
     if (password.length < 6) {
       showMessage("La contraseña debe tener mínimo 6 caracteres", "error");
+
       return;
     }
 
-    // Nota: El guardado real en base de datos será en el Avance 3.
     showMessage("Cuenta creada correctamente", "success");
 
-    // 2. CAMBIO CLAVE: Navegamos al Login usando React Navigation
     setTimeout(() => {
       navigation.navigate("Login");
     }, 1200);
@@ -53,114 +57,126 @@ export default function Registro({ navigation }) {
 
   return (
     <View style={styles.container}>
+     
+      {message !== "" && (
+        <View
+          style={[
+            styles.toast,
 
-      {mensaje !== "" && (
-        <View style={[
-          styles.toast,
-          { backgroundColor: tipo === "error" ? "#EF4444" : "#10B981" }
-        ]}>
-          <Text style={styles.toastText}>
-            {mensaje}
-          </Text>
+            messageType === "error" ? styles.errorToast : styles.successToast,
+          ]}
+        >
+          <Text style={styles.toastText}>{message}</Text>
         </View>
       )}
 
-      <View style={styles.card}>
 
-        <Text style={styles.title}>Crear cuenta</Text>
+      <View style={styles.card}>
+        <Text style={styles.title}>Crear Cuenta</Text>
 
         <TextInput
           placeholder="Usuario"
-          value={nombre}
-          onChangeText={setNombre}
-          style={styles.input}
           placeholderTextColor="#9CA3AF"
+          value={username}
+          onChangeText={setUsername}
+          style={styles.input}
         />
 
         <TextInput
-          placeholder="Correo"
-          value={correo}
-          onChangeText={setCorreo}
-          style={styles.input}
+          placeholder="Correo electrónico"
           placeholderTextColor="#9CA3AF"
           keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
         />
 
         <TextInput
           placeholder="Contraseña"
+          placeholderTextColor="#9CA3AF"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
           style={styles.input}
-          placeholderTextColor="#9CA3AF"
         />
-
         <Button title="Crear cuenta" onPress={handleRegister} />
 
-        {/* 3. CAMBIO CLAVE: Cambiamos setScreen por navigation.navigate */}
-        <Text
-          onPress={() => navigation.navigate("Login")}
-          style={styles.link}
-        >
-          Ya tengo cuenta
-        </Text>
-
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <Text style={styles.link}>Ya tengo una cuenta</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-// 4. BUENA PRÁCTICA: Envolvemos los estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
     justifyContent: "center",
-    padding: 20
+    paddingHorizontal: 20,
+    backgroundColor: "#F3F4F6",
   },
+
   card: {
     backgroundColor: "#FFFFFF",
-    padding: 24,
-    borderRadius: 20,
+    borderRadius: 22,
+    paddingVertical: 28,
+    paddingHorizontal: 24,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
-    elevation: 3
+    elevation: 4,
   },
+
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
     color: "#111827",
-    marginBottom: 20,
-    textAlign: "center"
+    textAlign: "center",
+    marginBottom: 24,
   },
+
   input: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#E5E7EB",
-    padding: 14,
     borderRadius: 12,
-    marginBottom: 12,
-    color: "#111827"
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 14,
+    color: "#111827",
+    fontSize: 16,
   },
+
   link: {
-    marginTop: 15,
+    marginTop: 18,
     textAlign: "center",
     color: "#2563EB",
-    fontWeight: "500"
+    fontWeight: "600",
   },
+
   toast: {
     position: "absolute",
-    top: 50,
+    top: 55,
     left: 20,
     right: 20,
-    padding: 12,
-    borderRadius: 10,
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: "center",
-    zIndex: 999
+    zIndex: 999,
   },
+
+  errorToast: {
+    backgroundColor: "#EF4444",
+  },
+
+  successToast: {
+    backgroundColor: "#10B981",
+  },
+
   toastText: {
-    color: "white",
-    fontWeight: "bold"
-  }
+    color: "#FFFFFF",
+    fontWeight: "bold",
+  },
 });

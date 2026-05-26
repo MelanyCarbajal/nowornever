@@ -1,149 +1,175 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import Button from "../components/Button";
 
-export default function NuevaSimulacion({ navigation }) {
-  // Manejo de estados para el API
-  const [consejo, setConsejo] = useState("");
+import {  View,  Text,  StyleSheet,  ActivityIndicator,  ScrollView,} from "react-native";
+
+import Button from "../components/Button";
+import Header from "../components/Header";
+
+export default function Recomendaciones({ navigation }) {
+
+
+  const [mensaje, setMensaje] = useState("");
+  const [autor, setAutor] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // Funcionalidad para consumir el API
-const obtenerRecomendacion = async () => {
-  setLoading(true);
-  setError(false);
+ {/*api extenro*/}
+  const obtenerMensaje = async () => {
+    setLoading(true);
 
-  try {
-    // API de frases
-    const respuesta = await fetch(
-      "https://dummyjson.com/quotes/random"
-    );
+    setError(false);
 
-    if (!respuesta.ok) {
-      throw new Error("Error en la respuesta");
+    try {
+      const response = await fetch(
+        "https://official-joke-api.appspot.com/random_joke",
+      );
+
+      if (!response.ok) {
+        throw new Error("Error API");
+      }
+
+      const data = await response.json();
+
+      setMensaje(`${data.setup} ${data.punchline}`);
+
+      setAutor("API Externa");
+    } catch (error) {
+      console.error(error);
+
+      setError(true);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const datos = await respuesta.json();
-
-    // Traducción automática
-    const traduccion = await fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-        datos.quote
-      )}&langpair=en|es`
-    );
-
-    const datosTraducidos = await traduccion.json();
-
-    setConsejo(datosTraducidos.responseData.translatedText);
-
-  } catch (error) {
-    console.error("Hubo un error al consumir la API:", error);
-    setError(true);
-
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-  // Llamar al API al cargar la pantalla
   useEffect(() => {
-    obtenerRecomendacion();
+    obtenerMensaje();
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        
-        <Text style={styles.title}>
-          Acciones Correctivas
-        </Text>
+    <View style={styles.wrapper}>
+      {/* HEADER */}
+      <Header navigation={navigation} />
 
-        <Text style={styles.subtitle}>
-          Un consejo en tiempo real para evitar tu Punto de No Retorno
-        </Text>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Mensajes Positivos</Text>
 
-        <View style={styles.apiContainer}>
-          {loading ? (
-            <ActivityIndicator size="large" color="#2563EB" />
-          ) : error ? (
-            <Text style={styles.errorText}>
-              No pudimos conectar con el servidor
-            </Text>
-          ) : (
-            <Text style={styles.consejoText}>
-              {consejo}
-            </Text>
-          )}
+          <Text style={styles.subtitle}>
+            Frases motivacionales en tiempo real para ayudarte a evitar la
+            procrastinación.
+          </Text>
 
-          <View style={{ height: 20 }} />
+          <View style={styles.messageContainer}>
+            {loading ? (
+              <ActivityIndicator size="large" color="#2563EB" />
+            ) : error ? (
+              <Text style={styles.errorText}>
+                No se pudo conectar al servidor
+              </Text>
+            ) : (
+              <>
+                <Text style={styles.messageText}>"{mensaje}"</Text>
 
-          <Button
-            title="Obtener otro consejo"
-            onPress={obtenerRecomendacion}
-          />
+                <Text style={styles.authorText}>— {autor}</Text>
+              </>
+            )}
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <Button title="Obtener otro mensaje" onPress={obtenerMensaje} />
+          </View>
         </View>
-
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor: "#F3F4F6",
+  },
+
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
-    justifyContent: "center",
-    alignItems: "center",
     padding: 20,
   },
 
   card: {
     backgroundColor: "#FFFFFF",
-    padding: 26,
-    borderRadius: 20,
-    width: "100%",
-    maxWidth: 340,
+
+    borderRadius: 24,
+
+    padding: 24,
+
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
-    elevation: 3,
-    alignItems: "center",
+
+    elevation: 4,
   },
 
   title: {
-    fontSize: 24,
-    color: "#111827",
+    fontSize: 26,
+
     fontWeight: "bold",
-    marginBottom: 10,
+
+    color: "#111827",
+
     textAlign: "center",
+
+    marginBottom: 10,
   },
 
   subtitle: {
-    color: "#6B7280",
-    marginBottom: 20,
-    textAlign: "center",
     fontSize: 14,
+
+    color: "#6B7280",
+
+    textAlign: "center",
+
+    marginBottom: 30,
+
+    lineHeight: 20,
   },
 
-  apiContainer: {
-    minHeight: 100,
+  messageContainer: {
+    minHeight: 220,
+
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 10,
   },
 
-  consejoText: {
-    fontSize: 18,
-    color: "#4A90E2",
-    fontStyle: "italic",
+  messageText: {
+    fontSize: 20,
+
+    color: "#2563EB",
+
     textAlign: "center",
+
+    fontStyle: "italic",
+
     fontWeight: "600",
+
+    marginBottom: 20,
+  },
+
+  authorText: {
+    fontSize: 14,
+
+    color: "#6B7280",
   },
 
   errorText: {
-    fontSize: 14,
     color: "#EF4444",
+
+    fontWeight: "500",
+
     textAlign: "center",
+  },
+
+  buttonContainer: {
+    marginTop: 30,
   },
 });
