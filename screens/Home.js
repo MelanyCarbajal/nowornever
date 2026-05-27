@@ -1,42 +1,79 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, } from "react-native";
+
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 
 import Header from "../components/Header";
 
-export default function Home({ navigation }) {
+export default function Home({ navigation, route }) {
 
-  const nombreUsuario = "Usuario"; 
+  // Obtener nombre enviado desde Login
+  const nombreUsuario =
+    route?.params?.username || "Usuario";
 
   return (
     <View style={styles.wrapper}>
 
+      {/* HEADER */}
       <Header navigation={navigation} />
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
 
+        {/* BIENVENIDA */}
         <View style={styles.headerSection}>
-          <Text style={styles.title}>Dashboard</Text>
 
-          <Text style={styles.subtitle}>Hola, {nombreUsuario} 👋</Text>
+          <Text style={styles.title}>
+            Dashboard
+          </Text>
+
+          <Text style={styles.subtitle}>
+            Hola, {nombreUsuario} 👋
+          </Text>
+
         </View>
 
+        {/* CARD PRINCIPAL */}
         <TouchableOpacity
           activeOpacity={0.9}
-          onPress={() => navigation.navigate("NuevaSimulacion")}
+          onPress={() =>
+            navigation.navigate("NuevaSimulacion")
+          }
         >
-          <View style={styles.mainCard}>
-            <Text style={styles.mainIcon}>＋</Text>
 
-            <Text style={styles.mainTitle}>Nueva Simulación</Text>
+          <View style={styles.mainCard}>
+
+            <Text style={styles.mainIcon}>
+              ＋
+            </Text>
+
+            <Text style={styles.mainTitle}>
+              Nueva Simulación
+            </Text>
 
             <Text style={styles.mainSubtitle}>
               Define tu meta y predice tu resultado
             </Text>
+
           </View>
+
         </TouchableOpacity>
 
-        <Text style={styles.sectionTitle}>Herramientas</Text>
+        {/* SECCIÓN */}
+        <Text style={styles.sectionTitle}>
+          Herramientas
+        </Text>
+
+        {/* GRID */}
         <View style={styles.grid}>
+
           <DashboardCard
             icon="📊"
             title="Estadísticas"
@@ -48,8 +85,11 @@ export default function Home({ navigation }) {
             }
           />
 
-          <DashboardCard icon="📅" title="Historial" subtitle="Simulaciones"
-              onPress={() =>
+          <DashboardCard
+            icon="📅"
+            title="Historial"
+            subtitle="Simulaciones"
+            onPress={() =>
               navigation.navigate("PrivateTabs", {
                 screen: "Historial",
               })
@@ -60,39 +100,64 @@ export default function Home({ navigation }) {
             icon="💡"
             title="Consejos"
             subtitle="Acción correctiva"
-            onPress={() => navigation.navigate("Recomendaciones")}
+            onPress={() =>
+              navigation.navigate("Recomendaciones")
+            }
           />
 
           <DashboardCard
             icon="👤"
             title="Perfil"
             subtitle="Ver cuenta"
-            onPress={() => navigation.navigate("Perfil")}
+            onPress={() =>
+              navigation.navigate("Perfil")
+            }
           />
+
         </View>
+
       </ScrollView>
+
     </View>
   );
 }
 
+/* =========================
+   COMPONENTE REUTILIZABLE
+========================= */
 
-function DashboardCard({ icon, title, subtitle, onPress }) {
+function DashboardCard({
+  icon,
+  title,
+  subtitle,
+  onPress,
+}) {
+
   return (
     <TouchableOpacity
       style={styles.card}
       activeOpacity={0.85}
       onPress={onPress}
     >
-      <Text style={styles.cardIcon}>{icon}</Text>
 
-      <Text style={styles.cardTitle}>{title}</Text>
+      <Text style={styles.cardIcon}>
+        {icon}
+      </Text>
 
-      <Text style={styles.cardSubtitle}>{subtitle}</Text>
+      <Text style={styles.cardTitle}>
+        {title}
+      </Text>
+
+      <Text style={styles.cardSubtitle}>
+        {subtitle}
+      </Text>
+
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
+
   wrapper: {
     flex: 1,
     backgroundColor: "#F3F4F6",
@@ -209,4 +274,5 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     textAlign: "center",
   },
+
 });

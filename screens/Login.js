@@ -1,59 +1,128 @@
-import React, { useState } from "react";
-import {  View, Text, TextInput, StyleSheet,TouchableOpacity,} from "react-native";
+import React, {
+  useState,
+  useEffect,
+} from "react";
+
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+
 import Button from "../components/Button";
 
-export default function Login({ navigation }) {
+export default function Login({
+  navigation,
+  route,
+}) {
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
+  const [username, setUsername] =
+    useState("");
 
+  const [password, setPassword] =
+    useState("");
 
-  const showMessage = (text, type = "error") => {
+  const [message, setMessage] =
+    useState("");
+
+  const [messageType, setMessageType] =
+    useState("");
+
+  useEffect(() => {
+
+    if (route.params?.registeredUser) {
+
+      setUsername(
+        route.params.registeredUser
+      );
+    }
+
+  }, [route.params]);
+
+  const showMessage = (
+    text,
+    type = "error"
+  ) => {
+
     setMessage(text);
 
     setMessageType(type);
 
     setTimeout(() => {
+
       setMessage("");
+
       setMessageType("");
+
     }, 2000);
   };
 
   const handleLogin = () => {
-    // Validación simple
-    if (!username.trim() || !password.trim()) {
-      showMessage("Completa todos los campos", "error");
+
+    if (
+      !username.trim() ||
+      !password.trim()
+    ) {
+
+      showMessage(
+        "Completa todos los campos",
+        "error"
+      );
 
       return;
     }
 
-    showMessage(`Bienvenido ${username}`, "success");
+    showMessage(
+      `Bienvenido ${username}`,
+      "success"
+    );
 
     setTimeout(() => {
-      navigation.navigate("PrivateTabs");
+
+      navigation.navigate(
+        "PrivateTabs",
+        {
+          screen: "Home",
+
+          params: {
+            username: username,
+          },
+        }
+      );
+
     }, 1200);
   };
 
   return (
     <View style={styles.container}>
-      {/* MENSAJE FLOTANTE */}
+
       {message !== "" && (
+
         <View
           style={[
             styles.toast,
             {
-              backgroundColor: messageType === "error" ? "#EF4444" : "#10B981",
+              backgroundColor:
+                messageType === "error"
+                  ? "#EF4444"
+                  : "#10B981",
             },
           ]}
         >
-          <Text style={styles.toastText}>{message}</Text>
+          <Text style={styles.toastText}>
+            {message}
+          </Text>
         </View>
+
       )}
 
       <View style={styles.card}>
-        <Text style={styles.title}>Iniciar Sesión</Text>
+
+        <Text style={styles.title}>
+          Iniciar Sesión
+        </Text>
 
         <TextInput
           placeholder="Usuario"
@@ -71,17 +140,30 @@ export default function Login({ navigation }) {
           onChangeText={setPassword}
           style={styles.input}
         />
-        <Button title="Entrar" onPress={handleLogin} />
 
-        <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
-          <Text style={styles.link}>Crear cuenta</Text>
+        <Button
+          title="Entrar"
+          onPress={handleLogin}
+        />
+
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("Registro")
+          }
+        >
+          <Text style={styles.link}>
+            Crear cuenta
+          </Text>
         </TouchableOpacity>
+
       </View>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     justifyContent: "center",
@@ -141,4 +223,5 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "bold",
   },
+
 });

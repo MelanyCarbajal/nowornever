@@ -1,78 +1,132 @@
 import React, { useState } from "react";
-import {  View, Text, TextInput, TouchableOpacity, StyleSheet,} from "react-native";
+
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+
 import Button from "../components/Button";
 
 export default function Registro({ navigation }) {
 
   const [username, setUsername] = useState("");
+
   const [email, setEmail] = useState("");
+
   const [password, setPassword] = useState("");
+
   const [message, setMessage] = useState("");
+
   const [messageType, setMessageType] = useState("");
 
   const validateEmail = (emailText) => {
     return /\S+@\S+\.\S+/.test(emailText);
   };
 
-
-
   const showMessage = (text, type = "error") => {
+
     setMessage(text);
 
     setMessageType(type);
 
     setTimeout(() => {
+
       setMessage("");
+
       setMessageType("");
+
     }, 2000);
   };
 
-
-
   const handleRegister = () => {
-    if (!username.trim() || !email.trim() || !password.trim()) {
-      showMessage("Completa todos los campos", "error");
+
+    if (
+      !username.trim() ||
+      !email.trim() ||
+      !password.trim()
+    ) {
+
+      showMessage(
+        "Completa todos los campos",
+        "error"
+      );
+
+      return;
+    }
+
+    if (username.length < 3) {
+
+      showMessage(
+        "El usuario debe tener mínimo 3 caracteres",
+        "error"
+      );
 
       return;
     }
 
     if (!validateEmail(email)) {
-      showMessage("Correo electrónico inválido", "error");
+
+      showMessage(
+        "Correo electrónico inválido",
+        "error"
+      );
 
       return;
     }
 
     if (password.length < 6) {
-      showMessage("La contraseña debe tener mínimo 6 caracteres", "error");
+
+      showMessage(
+        "La contraseña debe tener mínimo 6 caracteres",
+        "error"
+      );
 
       return;
     }
 
-    showMessage("Cuenta creada correctamente", "success");
+    showMessage(
+      "Cuenta creada correctamente",
+      "success"
+    );
 
     setTimeout(() => {
-      navigation.navigate("Login");
+
+      navigation.navigate("Login", {
+        registeredUser: username,
+      });
+
     }, 1200);
   };
 
   return (
     <View style={styles.container}>
-     
+
       {message !== "" && (
+
         <View
           style={[
             styles.toast,
 
-            messageType === "error" ? styles.errorToast : styles.successToast,
+            messageType === "error"
+              ? styles.errorToast
+              : styles.successToast,
           ]}
         >
-          <Text style={styles.toastText}>{message}</Text>
+          <Text style={styles.toastText}>
+            {message}
+          </Text>
         </View>
+
       )}
 
-
       <View style={styles.card}>
-        <Text style={styles.title}>Crear Cuenta</Text>
+
+        <Text style={styles.title}>
+          Crear Cuenta
+        </Text>
 
         <TextInput
           placeholder="Usuario"
@@ -100,17 +154,30 @@ export default function Registro({ navigation }) {
           onChangeText={setPassword}
           style={styles.input}
         />
-        <Button title="Crear cuenta" onPress={handleRegister} />
 
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.link}>Ya tengo una cuenta</Text>
+        <Button
+          title="Crear cuenta"
+          onPress={handleRegister}
+        />
+
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("Login")
+          }
+        >
+          <Text style={styles.link}>
+            Ya tengo una cuenta
+          </Text>
         </TouchableOpacity>
+
       </View>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     justifyContent: "center",
@@ -179,4 +246,5 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "bold",
   },
+
 });
