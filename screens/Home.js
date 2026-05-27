@@ -1,25 +1,16 @@
 import React from "react";
-
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
-
+import {View,Text,TouchableOpacity,StyleSheet,ScrollView,} from "react-native";
 import Header from "../components/Header";
 
 export default function Home({ navigation, route }) {
 
-  // Obtener nombre enviado desde Login
+  // nombre del usaario
   const nombreUsuario =
-    route?.params?.username || "Usuario";
+    route.params?.username || "Usuario";
 
   return (
     <View style={styles.wrapper}>
 
-      {/* HEADER */}
       <Header navigation={navigation} />
 
       <ScrollView
@@ -27,7 +18,6 @@ export default function Home({ navigation, route }) {
         showsVerticalScrollIndicator={false}
       >
 
-        {/* BIENVENIDA */}
         <View style={styles.headerSection}>
 
           <Text style={styles.title}>
@@ -40,14 +30,12 @@ export default function Home({ navigation, route }) {
 
         </View>
 
-        {/* CARD PRINCIPAL */}
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() =>
             navigation.navigate("NuevaSimulacion")
           }
         >
-
           <View style={styles.mainCard}>
 
             <Text style={styles.mainIcon}>
@@ -63,15 +51,12 @@ export default function Home({ navigation, route }) {
             </Text>
 
           </View>
-
         </TouchableOpacity>
 
-        {/* SECCIÓN */}
         <Text style={styles.sectionTitle}>
           Herramientas
         </Text>
 
-        {/* GRID */}
         <View style={styles.grid}>
 
           <DashboardCard
@@ -79,9 +64,12 @@ export default function Home({ navigation, route }) {
             title="Estadísticas"
             subtitle="Ver progreso"
             onPress={() =>
-              navigation.navigate("PrivateTabs", {
-                screen: "Estadisticas",
-              })
+              navigation.navigate(
+                "PrivateTabs",
+                {
+                  screen: "Estadisticas",
+                }
+              )
             }
           />
 
@@ -90,9 +78,12 @@ export default function Home({ navigation, route }) {
             title="Historial"
             subtitle="Simulaciones"
             onPress={() =>
-              navigation.navigate("PrivateTabs", {
-                screen: "Historial",
-              })
+              navigation.navigate(
+                "PrivateTabs",
+                {
+                  screen: "Historial",
+                }
+              )
             }
           />
 
@@ -101,7 +92,9 @@ export default function Home({ navigation, route }) {
             title="Consejos"
             subtitle="Acción correctiva"
             onPress={() =>
-              navigation.navigate("Recomendaciones")
+              navigation.navigate(
+                "Recomendaciones"
+              )
             }
           />
 
@@ -122,9 +115,7 @@ export default function Home({ navigation, route }) {
   );
 }
 
-/* =========================
-   COMPONENTE REUTILIZABLE
-========================= */
+
 
 function DashboardCard({
   icon,
