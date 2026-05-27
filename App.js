@@ -11,6 +11,9 @@ import Home from "./screens/Home";
 import Perfil from "./screens/Perfil";
 import NuevaSimulacion from "./screens/NuevaSimulacion";
 import Recomendaciones from "./screens/Recomendaciones";
+import Resultado from "./screens/Resultado";
+import Estadisticas from "./screens/Estadisticas";
+import Historial from "./screens/Historial";
 
 const Stack = createNativeStackNavigator();
 
@@ -68,6 +71,21 @@ function PrivateTabs() {
           tabBarLabel: "Perfil",
         }}
       />
+
+      <Tab.Screen
+  name="Estadisticas"
+  component={Estadisticas}
+  options={{
+    tabBarLabel: "Stats",
+  }}
+/>
+      <Tab.Screen
+  name="Historial"
+  component={Historial}
+  options={{
+    tabBarLabel: "Historial",
+  }}
+/>
     </Tab.Navigator>
   );
 }
@@ -89,6 +107,7 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Registro" component={Registro} />
         <Stack.Screen name="PrivateTabs" component={PrivateTabs} />
+        <Stack.Screen name="Resultado" component={Resultado} />
       </Stack.Navigator>
     </NavigationContainer>
   );

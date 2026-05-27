@@ -51,7 +51,7 @@ export default function Perfil({ navigation }) {
   );
 }
 
-// 3. BUENA PRÁCTICA: Envolvemos tus estilos en StyleSheet.create()
+// 3. BUENA PRÁCTICA: Envolvemos los estilos en StyleSheet.create()
 const styles = StyleSheet.create({
   container: {
     flex: 1,

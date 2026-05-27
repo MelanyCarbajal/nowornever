@@ -1,28 +1,87 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Alert, StyleSheet } from "react-native";
-import Button from "../components/Button"; 
+import Button from "../components/Button";
 
 export default function NuevaSimulacion({ navigation }) {
-  // manejo de estados
   const [objetivo, setObjetivo] = useState("");
   const [fechaLimite, setFechaLimite] = useState("");
   const [horas, setHoras] = useState("");
   const [nivel, setNivel] = useState("");
 
-  // manejo de funciones 
   const handleSimular = () => {
-    
     if (!objetivo || !fechaLimite || !horas || !nivel) {
-      Alert.alert("Campos incompletos", "Por favor, llena todos los datos para calcular tu Punto de No Retorno.");
+      Alert.alert("Campos incompletos", "Completa todos los campos.");
       return;
     }
 
+    const horasNum = parseFloat(horas);
+    const nivelNum = parseInt(nivel);
 
-    Alert.alert(
-      "Datos Capturados", 
-      `Calculando el escenario para: ${objetivo}\nNivel de procrastinación: ${nivel}`
+    if (isNaN(horasNum) || isNaN(nivelNum)) {
+      Alert.alert("Error", "Horas y nivel deben ser números válidos");
+      return;
+    }
+
+    const hoy = new Date();
+    const limite = new Date(fechaLimite);
+
+    if (isNaN(limite.getTime())) {
+      Alert.alert("Error", "Formato de fecha inválido (YYYY-MM-DD)");
+      return;
+    }
+
+    const diasRestantes = Math.ceil(
+      (limite.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)
     );
-    
+
+    if (diasRestantes <= 0) {
+      Alert.alert("Fecha inválida", "La fecha ya pasó o es hoy");
+      return;
+    }
+
+    // productividad real
+    const factorProcrastinacion = 1 - (nivelNum / 10) * 0.6;
+    const factorSeguro = Math.max(0.1, Math.min(1, factorProcrastinacion));
+
+    const horasEfectivas = horasNum * factorSeguro;
+
+    // capacidad total disponible
+    const capacidadTotal = diasRestantes * horasEfectivas;
+
+    // riesgo (comparación interna)
+    const riesgoReal = (horasNum * 3) / capacidadTotal * 100;
+
+    let estado = "";
+    let mensaje = "";
+
+    if (riesgoReal < 60) {
+      estado = "Vas bien 🟢";
+      mensaje = "Tienes buen margen de tiempo";
+    } else if (riesgoReal < 85) {
+      estado = "Vas justo 🟡";
+      mensaje = "Organízate mejor";
+    } else if (riesgoReal <= 100) {
+      estado = "Muy justo 🔴";
+      mensaje = "Estás al límite";
+    } else {
+      estado = "No te alcanza ⚫";
+      mensaje = "Necesitas más tiempo o menos carga";
+    }
+
+    const horasEnteras = Math.floor(horasEfectivas);
+    const minutos = Math.round((horasEfectivas - horasEnteras) * 60);
+
+    navigation.navigate("Resultado", {
+      objetivo,
+      diasRestantes,
+      horasEfectivas,
+      horasEnteras,
+      minutos,
+      riesgo: riesgoReal,
+      estado,
+      mensaje,
+      sobrecarga: riesgoReal > 100,
+    });
   };
 
   return (
@@ -33,17 +92,17 @@ export default function NuevaSimulacion({ navigation }) {
           Ingresa los datos para predecir tu escenario y calcular el punto de no retorno.
         </Text>
 
-       
+
         <TextInput
           style={styles.input}
           placeholder="Objetivo (ej. Examen Final)"
           value={objetivo}
-          onChangeText={setObjetivo} 
+          onChangeText={setObjetivo}
         />
 
         <TextInput
           style={styles.input}
-          placeholder="Fecha Límite (ej. 30/10/2026)"
+          placeholder="Fecha Límite YYYY-MM-DD (2026-10-30)"
           value={fechaLimite}
           onChangeText={setFechaLimite}
         />
@@ -51,7 +110,7 @@ export default function NuevaSimulacion({ navigation }) {
         <TextInput
           style={styles.input}
           placeholder="Horas disponibles"
-          keyboardType="numeric" 
+          keyboardType="numeric"
           value={horas}
           onChangeText={setHoras}
         />
@@ -68,7 +127,7 @@ export default function NuevaSimulacion({ navigation }) {
 
         <Button
           title="Calcular Escenario"
-          onPress={handleSimular} 
+          onPress={handleSimular}
         />
       </View>
     </View>

@@ -1,11 +1,11 @@
 import React from "react";
-import {View,Text,TouchableOpacity,StyleSheet,ScrollView,} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, } from "react-native";
 
 import Header from "../components/Header";
 
 export default function Home({ navigation }) {
 
-  const userName = "Invitado";
+  const nombreUsuario = "Usuario"; 
 
   return (
     <View style={styles.wrapper}>
@@ -17,7 +17,7 @@ export default function Home({ navigation }) {
         <View style={styles.headerSection}>
           <Text style={styles.title}>Dashboard</Text>
 
-          <Text style={styles.subtitle}>Hola, {userName} 👋</Text>
+          <Text style={styles.subtitle}>Hola, {nombreUsuario} 👋</Text>
         </View>
 
         <TouchableOpacity
@@ -34,16 +34,27 @@ export default function Home({ navigation }) {
             </Text>
           </View>
         </TouchableOpacity>
-   
+
         <Text style={styles.sectionTitle}>Herramientas</Text>
         <View style={styles.grid}>
           <DashboardCard
             icon="📊"
             title="Estadísticas"
             subtitle="Ver progreso"
+            onPress={() =>
+              navigation.navigate("PrivateTabs", {
+                screen: "Estadisticas",
+              })
+            }
           />
 
-          <DashboardCard icon="📅" title="Historial" subtitle="Simulaciones" />
+          <DashboardCard icon="📅" title="Historial" subtitle="Simulaciones"
+              onPress={() =>
+              navigation.navigate("PrivateTabs", {
+                screen: "Historial",
+              })
+            }
+          />
 
           <DashboardCard
             icon="💡"
