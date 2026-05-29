@@ -72,20 +72,6 @@ function PrivateTabs() {
         }}
       />
 
-      <Tab.Screen
-  name="Estadisticas"
-  component={Estadisticas}
-  options={{
-    tabBarLabel: "Stats",
-  }}
-/>
-      <Tab.Screen
-  name="Historial"
-  component={Historial}
-  options={{
-    tabBarLabel: "Historial",
-  }}
-/>
     </Tab.Navigator>
   );
 }
@@ -108,6 +94,8 @@ export default function App() {
         <Stack.Screen name="Registro" component={Registro} />
         <Stack.Screen name="PrivateTabs" component={PrivateTabs} />
         <Stack.Screen name="Resultado" component={Resultado} />
+        <Stack.Screen name="Historial" component={Historial} />
+        <Stack.Screen name="Estadisticas" component={Estadisticas} />
       </Stack.Navigator>
     </NavigationContainer>
   );

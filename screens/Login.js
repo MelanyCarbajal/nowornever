@@ -34,7 +34,7 @@ export default function Login({ navigation, route }) {
       return;
     }
 
-    showMessage(`Bienvenido ${username}`, "success");
+    showMessage(`¡Bienvenid@, ${username}!`, "success");
 
     setTimeout(() => {
       navigation.navigate("PrivateTabs", {

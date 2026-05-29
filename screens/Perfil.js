@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import Button from "../components/Button";
 
 // 1. CAMBIO CLAVE: Cambiamos '{ setScreen }' por '{ navigation }'
@@ -30,15 +30,22 @@ export default function Perfil({ navigation }) {
         </Text>
 
         {/* Tarjetas */}
-        <View style={styles.miniCard}>
+        <TouchableOpacity
+        style={styles.miniCard}
+        activeOpacity={0.85}
+        onPress={() => navigation.navigate("Estadisticas")}>
           <Text style={styles.icon}>📊</Text>
           <Text style={styles.cardTitle}>Estadísticas</Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.miniCard}>
-          <Text style={styles.icon}>🏆</Text>
-          <Text style={styles.cardTitle}>Logros</Text>
-        </View>
+        <TouchableOpacity
+        style={styles.miniCard}
+        activeOpacity={0.85}
+        onPress={() => navigation.navigate("Historial")}>
+          <Text style={styles.icon}>🗂️</Text>
+          <Text style={styles.cardTitle}>Historial</Text>
+        </TouchableOpacity>
+        
 
         {/* 2. CAMBIO CLAVE: Usamos navigation.navigate("Home") para volver a la pestaña principal */}
         <Button

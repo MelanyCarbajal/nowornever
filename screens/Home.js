@@ -65,10 +65,7 @@ export default function Home({ navigation, route }) {
             subtitle="Ver progreso"
             onPress={() =>
               navigation.navigate(
-                "PrivateTabs",
-                {
-                  screen: "Estadisticas",
-                }
+              "Estadisticas"
               )
             }
           />
@@ -79,10 +76,7 @@ export default function Home({ navigation, route }) {
             subtitle="Simulaciones"
             onPress={() =>
               navigation.navigate(
-                "PrivateTabs",
-                {
-                  screen: "Historial",
-                }
+                "Historial"
               )
             }
           />
@@ -114,8 +108,6 @@ export default function Home({ navigation, route }) {
     </View>
   );
 }
-
-
 
 function DashboardCard({
   icon,

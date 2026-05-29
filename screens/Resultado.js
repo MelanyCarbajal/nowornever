@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import Button from "../components/Button";
 
-export default function Resultado({ route }) {
+export default function Resultado({ route, navigation }) {
   const {
     objetivo,
     diasRestantes,
@@ -38,43 +39,50 @@ export default function Resultado({ route }) {
 
       <Text style={styles.title}>📊 NowOrNever</Text>
 
-      {/* 🧠 OBJETIVO */}
+      {/* OBJETIVO */}
       <View style={styles.card}>
         <Text style={styles.label}>🎯 Objetivo</Text>
         <Text style={styles.value}>{objetivo}</Text>
       </View>
 
-      {/* 📅 DÍAS */}
+      {/* DÍAS */}
       <View style={styles.card}>
         <Text style={styles.label}>📅 Días restantes</Text>
         <Text style={styles.value}>{diasRestantes}</Text>
       </View>
 
-      {/* ⚡ TIEMPO */}
+      {/* TIEMPO */}
       <View style={styles.card}>
-        <Text style={styles.label}>⚡ Tiempo real disponible</Text>
+        <Text style={styles.label}>⚡Tiempo real disponible</Text>
         <Text style={styles.counter}>
           {horas}h {minutos}m
         </Text>
       </View>
 
-      {/* 📊 RIESGO */}
+      {/* RIESGO */}
       <View style={styles.card}>
         <Text style={styles.label}>📊 Riesgo</Text>
         <Text style={styles.riesgo}>{riesgo.toFixed(0)}%</Text>
       </View>
 
-      {/* 🟡 ESTADO */}
+      {/* ESTADO */}
       <View style={[styles.statusCard, getStatusColor(estado)]}>
         <Text style={styles.estado}>{estado}</Text>
         <Text style={styles.mensaje}>{mensaje}</Text>
       </View>
 
+
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={styles.backButtonText}>Volver</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
-/* 🎨 COLOR DINÁMICO */
+/* COLORES */
 const getStatusColor = (estado) => {
   if (estado.includes("Vas bien")) return { backgroundColor: "#DCFCE7" };
   if (estado.includes("justo")) return { backgroundColor: "#FEF9C3" };
@@ -98,10 +106,17 @@ const styles = StyleSheet.create({
 
   card: {
     backgroundColor: "#FFFFFF",
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    elevation: 3,
+    padding: 18,
+    borderRadius: 20,
+    marginBottom: 14,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    elevation: 4,
   },
 
   label: {
@@ -123,7 +138,7 @@ const styles = StyleSheet.create({
   },
 
   riesgo: {
-    fontSize: 22,
+    fontSize: 34,
     fontWeight: "bold",
     color: "#DC2626",
   },
@@ -136,7 +151,7 @@ const styles = StyleSheet.create({
   },
 
   estado: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: "bold",
     color: "#111827",
   },
@@ -146,5 +161,18 @@ const styles = StyleSheet.create({
     color: "#374151",
     marginTop: 5,
     textAlign: "center",
+  },
+  backButton: {
+    backgroundColor: "#2563EB",
+    paddingVertical: 14,
+    borderRadius: 14,
+    marginTop: 20,
+    alignItems: "center",
+  },
+
+  backButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

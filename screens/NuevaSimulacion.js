@@ -23,7 +23,10 @@ export default function NuevaSimulacion({ navigation }) {
     }
 
     const hoy = new Date();
-    const limite = new Date(fechaLimite);
+    hoy.setHours(0, 0, 0, 0);
+
+    const limite= new Date(fechaLimite);
+    limite.setHours(0,0,0,0);
 
     if (isNaN(limite.getTime())) {
       Alert.alert("Error", "Formato de fecha inválido (YYYY-MM-DD)");
@@ -34,8 +37,8 @@ export default function NuevaSimulacion({ navigation }) {
       (limite.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)
     );
 
-    if (diasRestantes <= 0) {
-      Alert.alert("Fecha inválida", "La fecha ya pasó o es hoy");
+    if (diasRestantes < 0) {
+      Alert.alert("Fecha inválida", "La fecha ya pasó");
       return;
     }
 
@@ -46,10 +49,14 @@ export default function NuevaSimulacion({ navigation }) {
     const horasEfectivas = horasNum * factorSeguro;
 
     // capacidad total disponible
-    const capacidadTotal = diasRestantes * horasEfectivas;
+   
 
+    
     // riesgo (comparación interna)
-    const riesgoReal = (horasNum * 3) / capacidadTotal * 100;
+    const capacidadTotal= Math.max(1, diasRestantes) * horasEfectivas;
+    const riesgoCalculado= (horasNum * 3) / capacidadTotal *100;
+    //Limitar riesgo a 100%
+    const riesgoReal= Math.min(riesgoCalculado, 100);
 
     let estado = "";
     let mensaje = "";
