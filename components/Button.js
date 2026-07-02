@@ -1,29 +1,33 @@
-import React from "react";
-
+import React, { useContext } from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { ThemeContext } from "../context/ThemeContext";
 
 export default function Button({
   title,
   onPress,
   variant = "primary",
   disabled = false,
+  style = {}
 }) {
- 
+  const { theme } = useContext(ThemeContext);
+
   const buttonStyle = [
     styles.button,
-
-    variant === "danger" && styles.dangerButton,
-
-    variant === "outline" && styles.outlineButton,
-
-    disabled && styles.disabledButton,
+    { backgroundColor: theme.primary },
+    variant === "danger" && { backgroundColor: theme.danger },
+    variant === "outline" && { backgroundColor: "transparent", borderColor: theme.primary, borderWidth: 1 },
+    disabled && { backgroundColor: theme.textSecondary, opacity: 0.7 },
+    style
   ];
 
-  const textStyle = [styles.text, variant === "outline" && styles.outlineText];
+  const textStyle = [
+    styles.text,
+    variant === "outline" && { color: theme.primary },
+  ];
 
   return (
     <TouchableOpacity
-      activeOpacity={0.85}
+      activeOpacity={0.8}
       onPress={onPress}
       disabled={disabled}
       style={buttonStyle}
@@ -35,46 +39,18 @@ export default function Button({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#2563EB",
-
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-
-    borderRadius: 14,
-
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 16,
     alignItems: "center",
-
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 6,
-
+    shadowRadius: 8,
     elevation: 3,
   },
-
-  dangerButton: {
-    backgroundColor: "#EF4444",
-  },
-
-  outlineButton: {
-    backgroundColor: "transparent",
-
-    borderWidth: 1,
-    borderColor: "#2563EB",
-  },
-
-  disabledButton: {
-    backgroundColor: "#9CA3AF",
-    opacity: 0.7,
-  },
-
   text: {
     color: "#FFFFFF",
-
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "bold",
-  },
-
-  outlineText: {
-    color: "#2563EB",
   },
 });

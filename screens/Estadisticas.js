@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import React, { useEffect, useState, useContext } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import { ThemeContext } from "../context/ThemeContext";
+import { Ionicons as Icon } from "@expo/vector-icons";
 
 export default function Estadisticas({ navigation }) {
+  const { theme, isDarkMode } = useContext(ThemeContext);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -20,11 +17,8 @@ export default function Estadisticas({ navigation }) {
     try {
       setLoading(true);
       setError(false);
-
       const json = require("../assets/data/estadisticas.json");
-
       await new Promise((resolve) => setTimeout(resolve, 900));
-
       setData(json);
     } catch (e) {
       setError(true);
@@ -33,457 +27,132 @@ export default function Estadisticas({ navigation }) {
     }
   };
 
-  // LOADING
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <View style={styles.loadingCard}>
-          <Text style={styles.loadingEmoji}>📊</Text>
-
-
-          <Text style={styles.loadingTitle}>
-            Analizando productividad
-          </Text>
-
-          <Text style={styles.loadingText}>
-            Calculando escenarios y riesgo...
-          </Text>
-
-          <Text style={styles.loadingDots}>
-            ● ● ●
-          </Text>
+      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <View style={[styles.loadingCard, { backgroundColor: theme.card }]}>
+          <Icon name="bar-chart" size={64} color={theme.primary} style={{ marginBottom: 16 }} />
+          <Text style={[styles.loadingTitle, { color: theme.text }]}>Analizando productividad</Text>
+          <Text style={[styles.loadingText, { color: theme.textSecondary }]}>Calculando escenarios y riesgo...</Text>
+          <Text style={[styles.loadingDots, { color: theme.primary }]}>● ● ●</Text>
         </View>
       </View>
     );
   }
 
-  // ERROR
   if (error) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.errorTitle}>
-          ⚠️ Error
-        </Text>
-
-        <Text style={styles.errorText}>
-          No se pudieron cargar los datos
-        </Text>
+      <View style={[styles.center, { backgroundColor: theme.background }]}>
+        <Icon name="alert-circle" size={48} color={theme.danger} style={{ marginBottom: 10 }} />
+        <Text style={[styles.errorTitle, { color: theme.danger }]}>Error</Text>
+        <Text style={[styles.errorText, { color: theme.textSecondary }]}>No se pudieron cargar los datos</Text>
       </View>
     );
   }
 
-  // CÁLCULOS
-  const promedio =
-    data.length > 0
-      ? Math.round(
-        data.reduce(
-          (acc, item) => acc + item.riesgo,
-          0
-        ) / data.length
-      )
-      : 0;
-
-  const criticos = data.filter(
-    (item) => item.riesgo >= 85
-  ).length;
-
-  const moderados = data.filter(
-    (item) =>
-      item.riesgo >= 60 && item.riesgo < 85
-  ).length;
-
-  const seguros = data.filter(
-    (item) => item.riesgo < 60
-  ).length;
+  const promedio = data.length > 0 ? Math.round(data.reduce((acc, item) => acc + item.riesgo, 0) / data.length) : 0;
+  const criticos = data.filter((item) => item.riesgo >= 85).length;
+  const moderados = data.filter((item) => item.riesgo >= 60 && item.riesgo < 85).length;
+  const seguros = data.filter((item) => item.riesgo < 60).length;
 
   return (
-    <ScrollView
-      style={styles.container}
-      showsVerticalScrollIndicator={false}>
-      <TouchableOpacity
-        onPress={() => navigation.navigate("PrivateTabs", { screen: "Perfil" })}
-        style={styles.backBtn}
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <View style={styles.contentWrapper}>
+        <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={[styles.backBtn, { backgroundColor: theme.primary }]}
         activeOpacity={0.8}>
-        <Text style={styles.backText}>Volver al perfil</Text>
+        <Icon name="arrow-back" size={20} color="#FFFFFF" style={{ marginRight: 6 }} />
+        <Text style={styles.backText}>Volver</Text>
       </TouchableOpacity>
-      <Text style={styles.title}>
-        📊 Estadísticas NowOrNever
-      </Text>
+      
+      <Text style={[styles.title, { color: theme.text }]}>Estadísticas</Text>
 
-      {/* CARD PRINCIPAL */}
-      <TouchableOpacity
-        style={styles.mainCard}
-        activeOpacity={0.85}
-      >
-        <Text style={styles.mainLabel}>
-          Simulaciones realizadas
-        </Text>
-
-        <Text style={styles.mainValue}>
-          {data.length}
-        </Text>
-
-        <Text style={styles.subText}>
-          Sigue mejorando tu productividad 🚀
-        </Text>
+      <TouchableOpacity style={[styles.mainCard, { backgroundColor: theme.primary, shadowColor: theme.primary }]} activeOpacity={0.85}>
+        <Text style={styles.mainLabel}>Simulaciones realizadas</Text>
+        <Text style={styles.mainValue}>{data.length}</Text>
+        <Text style={styles.subText}>Sigue mejorando tu productividad 🚀</Text>
       </TouchableOpacity>
 
-      {/* GRID */}
       <View style={styles.grid}>
-
         {/* PROMEDIO */}
-        <View
-          style={[
-            styles.statCard,
-            styles.blueCard
-          ]}
-        >
-          <Text style={styles.statEmoji}>
-            📈
-          </Text>
-
-          <Text style={styles.blueNumber}>
-            {promedio}%
-          </Text>
-
-          <Text style={styles.statLabel}>
-            Riesgo promedio
-          </Text>
+        <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#1E3A8A" : "#DBEAFE" }]}>
+          <Icon name="trending-up" size={28} color={isDarkMode ? "#60A5FA" : "#1D4ED8"} style={styles.statIcon} />
+          <Text style={[styles.blueNumber, { color: isDarkMode ? "#60A5FA" : "#1D4ED8" }]}>{promedio}%</Text>
+          <Text style={[styles.statLabel, { color: theme.text }]}>Riesgo promedio</Text>
         </View>
 
         {/* CRITICOS */}
-        <View
-          style={[
-            styles.statCard,
-            styles.redCard
-          ]}
-        >
-          <Text style={styles.statEmoji}>
-            🔥
-          </Text>
-
-          <Text style={styles.redNumber}>
-            {criticos}
-          </Text>
-
-          <Text style={styles.statLabel}>
-            Escenarios críticos
-          </Text>
+        <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#7F1D1D" : "#FEE2E2" }]}>
+          <Icon name="flame" size={28} color={isDarkMode ? "#FCA5A5" : "#DC2626"} style={styles.statIcon} />
+          <Text style={[styles.redNumber, { color: isDarkMode ? "#FCA5A5" : "#DC2626" }]}>{criticos}</Text>
+          <Text style={[styles.statLabel, { color: theme.text }]}>Escenarios críticos</Text>
         </View>
 
         {/* MODERADOS */}
-        <View
-          style={[
-            styles.statCard,
-            styles.yellowCard
-          ]}
-        >
-          <Text style={styles.statEmoji}>
-            ⚠️
-          </Text>
-
-          <Text style={styles.yellowNumber}>
-            {moderados}
-          </Text>
-
-          <Text style={styles.statLabel}>
-            Escenarios moderados
-          </Text>
+        <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#713F12" : "#FEF3C7" }]}>
+          <Icon name="warning" size={28} color={isDarkMode ? "#FDE047" : "#D97706"} style={styles.statIcon} />
+          <Text style={[styles.yellowNumber, { color: isDarkMode ? "#FDE047" : "#D97706" }]}>{moderados}</Text>
+          <Text style={[styles.statLabel, { color: theme.text }]}>Escenarios moderados</Text>
         </View>
 
         {/* SEGUROS */}
-        <View
-          style={[
-            styles.statCard,
-            styles.greenCard
-          ]}
-        >
-          <Text style={styles.statEmoji}>
-            ✅
-          </Text>
-
-          <Text style={styles.greenNumber}>
-            {seguros}
-          </Text>
-
-          <Text style={styles.statLabel}>
-            Escenarios seguros
-          </Text>
+        <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#064E3B" : "#DCFCE7" }]}>
+          <Icon name="checkmark-circle" size={28} color={isDarkMode ? "#34D399" : "#16A34A"} style={styles.statIcon} />
+          <Text style={[styles.greenNumber, { color: isDarkMode ? "#34D399" : "#16A34A" }]}>{seguros}</Text>
+          <Text style={[styles.statLabel, { color: theme.text }]}>Escenarios seguros</Text>
         </View>
       </View>
 
-      {/* MENSAJE DINÁMICO */}
-      <View style={styles.tipCard}>
-        <Text style={styles.tipTitle}>
-          ⚡ Recomendación
+      <View style={[styles.tipCard, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
+        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+          <Icon name="bulb" size={24} color={theme.warning} style={{ marginRight: 8 }} />
+          <Text style={[styles.tipTitle, { color: theme.text }]}>Recomendación</Text>
+        </View>
+        <Text style={[styles.tipText, { color: theme.textSecondary }]}>
+          {promedio < 40
+            ? "Excelente organización. Mantienes un riesgo bastante bajo."
+            : promedio < 60
+              ? "Tu productividad es estable. Sigue manteniendo tus horarios."
+              : promedio < 85
+                ? "Tus simulaciones muestran presión moderada. Organiza mejor tus tiempos."
+                : "Nivel de riesgo elevado. Reduce carga o aumenta horas disponibles."}
         </Text>
-
-        <Text style={styles.tipText}>
-          {
-            promedio < 40
-              ? "Excelente organización. Mantienes un riesgo bastante bajo."
-              : promedio < 60
-                ? "Tu productividad es estable. Sigue manteniendo tus horarios."
-                : promedio < 85
-                  ? "Tus simulaciones muestran presión moderada. Organiza mejor tus tiempos."
-                  : "Nivel de riesgo elevado. Reduce carga o aumenta horas disponibles."
-          }
-        </Text>
+      </View>
+      <View style={{ height: 40 }} />
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F3F4F6",
-    padding: 20,
-  },
-
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 18,
-    color: "#111827",
-  },
-
-  // LOADING
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F3F4F6",
-    padding: 20,
-  },
-
-  loadingCard: {
-    backgroundColor: "#FFFFFF",
-    padding: 35,
-    borderRadius: 24,
-    alignItems: "center",
-    width: "85%",
-
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-
-    elevation: 5,
-  },
-
-  loadingEmoji: {
-    fontSize: 55,
-    marginBottom: 12,
-  },
-
-  loadingTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#111827",
-  },
-
-  loadingText: {
-    marginTop: 8,
-    color: "#6B7280",
-    textAlign: "center",
-    fontSize: 14,
-  },
-
-  loadingDots: {
-    marginTop: 20,
-    fontSize: 22,
-    color: "#2563EB",
-    fontWeight: "bold",
-  },
-
-  // ERROR
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F3F4F6",
-    padding: 20,
-  },
-
-  errorTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#DC2626",
-    marginBottom: 10,
-  },
-
-  errorText: {
-    color: "#6B7280",
-    fontSize: 15,
-    textAlign: "center",
-  },
-
-  // CARD PRINCIPAL
-  mainCard: {
-    backgroundColor: "#2563EB",
-    padding: 24,
-    borderRadius: 22,
-    marginBottom: 18,
-
-    shadowColor: "#2563EB",
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-
-    elevation: 5,
-  },
-
-  mainLabel: {
-    color: "#DBEAFE",
-    fontSize: 14,
-  },
-
-  mainValue: {
-    fontSize: 42,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-    marginVertical: 6,
-  },
-
-  subText: {
-    color: "#BFDBFE",
-    fontSize: 13,
-  },
-
-  // GRID
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 18,
-  },
-
-  statCard: {
-    width: "48%",
-    borderRadius: 22,
-    padding: 18,
-    marginBottom: 14,
-
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-
-    elevation: 4,
-  },
-
-  statEmoji: {
-    fontSize: 24,
-    marginBottom: 10,
-  },
-
-  statLabel: {
-    marginTop: 8,
-    fontSize: 13,
-    fontWeight: "600",
-    lineHeight: 18,
-  },
-
-  // BLUE
-  blueCard: {
-    backgroundColor: "#DBEAFE",
-  },
-
-  blueNumber: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#1D4ED8",
-  },
-
-  // RED
-  redCard: {
-    backgroundColor: "#FEE2E2",
-  },
-
-  redNumber: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#DC2626",
-  },
-
-  // YELLOW
-  yellowCard: {
-    backgroundColor: "#FEF3C7",
-  },
-
-  yellowNumber: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#D97706",
-  },
-
-  // GREEN
-  greenCard: {
-    backgroundColor: "#DCFCE7",
-  },
-
-  greenNumber: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#16A34A",
-  },
-
-  // MENSAJE
-  tipCard: {
-    backgroundColor: "#111827",
-    padding: 22,
-    borderRadius: 22,
-    marginTop: 5,
-  },
-
-  tipTitle: {
-    color: "#FFFFFF",
-    fontSize: 17,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-
-  tipText: {
-    color: "#D1D5DB",
-    fontSize: 14,
-    lineHeight: 22,
-  },
-  backBtn: {
-  flexDirection: "row",
-  alignItems: "center",
-  alignSelf: "flex-start",
-
-  backgroundColor: "#2563EB",
-  paddingVertical: 10,
-  paddingHorizontal: 14,
-  borderRadius: 14,
-
-  marginBottom: 12,
-
-  shadowColor: "#000",
-  shadowOpacity: 0.15,
-  shadowRadius: 6,
-  shadowOffset: {
-    width: 0,
-    height: 3,
-  },
-
-  elevation: 5,
-},
-
-backText: {
-  color: "#FFFFFF",
-  fontWeight: "700",
-  fontSize: 14,
-},
+  container: { flex: 1 },
+  scrollContent: { flexGrow: 1, padding: 20 },
+  contentWrapper: { width: "100%", maxWidth: 650, alignSelf: "center", flex: 1 },
+  title: { fontSize: 26, fontWeight: "bold", marginBottom: 18 },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  loadingCard: { padding: 35, borderRadius: 24, alignItems: "center", width: "85%", shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 10, elevation: 5 },
+  loadingTitle: { fontSize: 22, fontWeight: "bold" },
+  loadingText: { marginTop: 8, textAlign: "center", fontSize: 14 },
+  loadingDots: { marginTop: 20, fontSize: 22, fontWeight: "bold" },
+  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  errorTitle: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
+  errorText: { fontSize: 15, textAlign: "center" },
+  mainCard: { padding: 24, borderRadius: 22, marginBottom: 18, shadowOpacity: 0.2, shadowRadius: 10, elevation: 5 },
+  mainLabel: { color: "#DBEAFE", fontSize: 14 },
+  mainValue: { fontSize: 42, fontWeight: "bold", color: "#FFFFFF", marginVertical: 6 },
+  subText: { color: "#BFDBFE", fontSize: 13 },
+  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginBottom: 18 },
+  statCard: { width: "48%", borderRadius: 22, padding: 18, marginBottom: 14, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 8, elevation: 4 },
+  statIcon: { marginBottom: 10 },
+  statLabel: { marginTop: 8, fontSize: 13, fontWeight: "600", lineHeight: 18 },
+  blueNumber: { fontSize: 30, fontWeight: "bold" },
+  redNumber: { fontSize: 30, fontWeight: "bold" },
+  yellowNumber: { fontSize: 30, fontWeight: "bold" },
+  greenNumber: { fontSize: 30, fontWeight: "bold" },
+  tipCard: { padding: 22, borderRadius: 22, marginTop: 5 },
+  tipTitle: { fontSize: 17, fontWeight: "bold" },
+  tipText: { fontSize: 14, lineHeight: 22 },
+  backBtn: { flexDirection: "row", alignItems: "center", alignSelf: "flex-start", paddingVertical: 10, paddingHorizontal: 14, borderRadius: 14, marginBottom: 12, shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 6, elevation: 5 },
+  backText: { color: "#FFFFFF", fontWeight: "700", fontSize: 14 },
 });

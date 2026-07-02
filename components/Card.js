@@ -1,22 +1,15 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View } from "react-native";
+import { ThemeContext } from "../context/ThemeContext";
 
-export default function Card({ children, variant = "default", style = {} }) {
-
-  const getBackground = () => {
-    switch (variant) {
-      case "dark":
-        return "#111827";
-      default:
-        return "#FFFFFF";
-    }
-  };
+export default function Card({ children, style = {} }) {
+  const { theme } = useContext(ThemeContext);
 
   return (
     <View
       style={[
         styles.card,
-        { backgroundColor: getBackground() },
+        { backgroundColor: theme.card },
         style
       ]}
     >
@@ -28,9 +21,8 @@ export default function Card({ children, variant = "default", style = {} }) {
 const styles = {
   card: {
     width: "100%",
-    padding: 20,
-    borderRadius: 18,
-
+    padding: 24,
+    borderRadius: 20,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,

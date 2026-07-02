@@ -1,15 +1,25 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Alert, StyleSheet } from "react-native";
+import React, { useState, useContext } from "react";
+import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity, ScrollView, Platform } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import Button from "../components/Button";
+import { ThemeContext } from "../context/ThemeContext";
 
 export default function NuevaSimulacion({ navigation }) {
+  const { theme } = useContext(ThemeContext);
   const [objetivo, setObjetivo] = useState("");
-  const [fechaLimite, setFechaLimite] = useState("");
+  const [fechaLimite, setFechaLimite] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [horas, setHoras] = useState("");
   const [nivel, setNivel] = useState("");
 
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || fechaLimite;
+    setShowDatePicker(Platform.OS === 'ios');
+    setFechaLimite(currentDate);
+  };
+
   const handleSimular = () => {
-    if (!objetivo || !fechaLimite || !horas || !nivel) {
+    if (!objetivo || !horas || !nivel) {
       Alert.alert("Campos incompletos", "Completa todos los campos.");
       return;
     }
@@ -17,46 +27,30 @@ export default function NuevaSimulacion({ navigation }) {
     const horasNum = parseFloat(horas);
     const nivelNum = parseInt(nivel);
 
-    if (isNaN(horasNum) || isNaN(nivelNum)) {
-      Alert.alert("Error", "Horas y nivel deben ser números válidos");
+    if (isNaN(horasNum) || isNaN(nivelNum) || nivelNum < 1 || nivelNum > 10) {
+      Alert.alert("Error", "Horas deben ser número. Nivel de 1 a 10.");
       return;
     }
 
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    const limite= new Date(fechaLimite);
-    limite.setHours(0,0,0,0);
+    const limite = new Date(fechaLimite);
+    limite.setHours(0, 0, 0, 0);
 
-    if (isNaN(limite.getTime())) {
-      Alert.alert("Error", "Formato de fecha inválido (YYYY-MM-DD)");
-      return;
-    }
-
-    const diasRestantes = Math.ceil(
-      (limite.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const diasRestantes = Math.ceil((limite.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diasRestantes < 0) {
-      Alert.alert("Fecha inválida", "La fecha ya pasó");
+      Alert.alert("Fecha inválida", "La fecha límite ya pasó.");
       return;
     }
 
-    // productividad real
     const factorProcrastinacion = 1 - (nivelNum / 10) * 0.6;
     const factorSeguro = Math.max(0.1, Math.min(1, factorProcrastinacion));
-
     const horasEfectivas = horasNum * factorSeguro;
-
-    // capacidad total disponible
-   
-
-    
-    // riesgo (comparación interna)
-    const capacidadTotal= Math.max(1, diasRestantes) * horasEfectivas;
-    const riesgoCalculado= (horasNum * 3) / capacidadTotal *100;
-    //Limitar riesgo a 100%
-    const riesgoReal= Math.min(riesgoCalculado, 100);
+    const capacidadTotal = Math.max(1, diasRestantes) * 8; // asumiendo 8 horas max por día real
+    const riesgoCalculado = (horasNum) / capacidadTotal * 100;
+    const riesgoReal = Math.min(Math.max(riesgoCalculado * (nivelNum / 5), 10), 100);
 
     let estado = "";
     let mensaje = "";
@@ -79,83 +73,88 @@ export default function NuevaSimulacion({ navigation }) {
     const minutos = Math.round((horasEfectivas - horasEnteras) * 60);
 
     navigation.navigate("Resultado", {
-      objetivo,
-      diasRestantes,
-      horasEfectivas,
-      horasEnteras,
-      minutos,
-      riesgo: riesgoReal,
-      estado,
-      mensaje,
-      sobrecarga: riesgoReal > 100,
+      objetivo, diasRestantes, horasEfectivas, horasEnteras, minutos,
+      riesgo: riesgoReal, estado, mensaje, sobrecarga: riesgoReal > 100,
     });
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Nueva Simulación</Text>
-        <Text style={styles.subtitle}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.background }]} contentContainerStyle={styles.scrollContent}>
+      <View style={[styles.card, { backgroundColor: theme.card }]}>
+        <Text style={[styles.title, { color: theme.text }]}>Nueva Simulación</Text>
+        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
           Ingresa los datos para predecir tu escenario y calcular el punto de no retorno.
         </Text>
 
-
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border }]}
           placeholder="Objetivo (ej. Examen Final)"
+          placeholderTextColor={theme.textSecondary}
           value={objetivo}
           onChangeText={setObjetivo}
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Fecha Límite YYYY-MM-DD (2026-10-30)"
-          value={fechaLimite}
-          onChangeText={setFechaLimite}
-        />
+        <TouchableOpacity 
+          style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, justifyContent: 'center' }]} 
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Text style={{ color: theme.text }}>
+            Fecha Límite: {fechaLimite.toISOString().split('T')[0]}
+          </Text>
+        </TouchableOpacity>
+
+        {showDatePicker && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={fechaLimite}
+            mode="date"
+            is24Hour={true}
+            display="default"
+            onChange={onChangeDate}
+            minimumDate={new Date()}
+          />
+        )}
 
         <TextInput
-          style={styles.input}
-          placeholder="Horas disponibles"
+          style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border }]}
+          placeholder="Horas que crees necesitar"
+          placeholderTextColor={theme.textSecondary}
           keyboardType="numeric"
           value={horas}
           onChangeText={setHoras}
         />
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border }]}
           placeholder="Nivel de procrastinación (1-10)"
+          placeholderTextColor={theme.textSecondary}
           keyboardType="numeric"
           value={nivel}
           onChangeText={setNivel}
         />
 
-        <View style={{ height: 10 }} />
-
-        <Button
-          title="Calcular Escenario"
-          onPress={handleSimular}
-        />
+        <View style={{ height: 20 }} />
+        <Button title="Calcular Escenario" onPress={handleSimular} />
       </View>
-    </View>
+    </ScrollView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20
+    padding: 20,
   },
   card: {
-    backgroundColor: "#FFFFFF",
-    padding: 26,
-    borderRadius: 20,
+    padding: 30,
+    borderRadius: 24,
     width: "100%",
-    maxWidth: 340,
+    maxWidth: 360,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
@@ -163,26 +162,23 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    color: "#111827",
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center"
   },
   subtitle: {
-    color: "#6B7280",
-    marginBottom: 20,
+    marginBottom: 24,
     textAlign: "center",
-    fontSize: 14
+    fontSize: 14,
+    lineHeight: 20
   },
   input: {
-    backgroundColor: "#F3F4F6",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 15,
+    padding: 16,
+    borderRadius: 14,
+    marginBottom: 16,
     width: "100%",
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    color: "#111827"
+    fontSize: 16,
   }
 });
 
