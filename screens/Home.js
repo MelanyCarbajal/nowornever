@@ -1,138 +1,261 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import {View,Text,TouchableOpacity,StyleSheet,ScrollView,} from "react-native";
+import Header from "../components/Header";
 
-export default function Home({ user, setScreen }) {
+export default function Home({ navigation, route }) {
+
+  // nombre del usaario
+  const nombreUsuario =
+    route.params?.username || "Usuario";
+
   return (
-    <View style={styles.container}>
+    <View style={styles.wrapper}>
 
-      <Text style={styles.title}>Dashboard</Text>
+      <Header navigation={navigation} />
 
-      <Text style={styles.subtitle}>
-        Hola, {user?.nombre || "Usuario"} 👋
-      </Text>
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
 
-      {/* Tarjeta principal */}
-      <TouchableOpacity activeOpacity={0.85}>
-        <View style={styles.bigCard}>
-          <Text style={styles.bigIcon}>＋</Text>
-          <Text style={styles.bigTitle}>Nueva simulación</Text>
-          <Text style={styles.bigSub}>
-            Define tu meta y predice tu resultado
+        <View style={styles.headerSection}>
+
+          <Text style={styles.title}>
+            Dashboard
           </Text>
-        </View>
-      </TouchableOpacity>
 
-      {/* Grid */}
-      <View style={styles.grid}>
-        <PressCard icon="📊" title="Estadísticas" />
-        <PressCard icon="📅" title="Historial" />
-        <PressCard icon="🔔" title="Notificaciones" />
+          <Text style={styles.subtitle}>
+            Hola, {nombreUsuario} 👋
+          </Text>
+
+        </View>
 
         <TouchableOpacity
-          style={styles.card}
-          onPress={() => setScreen("perfil")}
+          activeOpacity={0.9}
+          onPress={() =>
+            navigation.navigate("NuevaSimulacion")
+          }
         >
-          <Text style={styles.cardIcon}>👤</Text>
-          <Text style={styles.cardTitle}>Perfil</Text>
-          <Text style={styles.cardSub}>Ver cuenta</Text>
+          <View style={styles.mainCard}>
+
+            <Text style={styles.mainIcon}>
+              ＋
+            </Text>
+
+            <Text style={styles.mainTitle}>
+              Nueva Simulación
+            </Text>
+
+            <Text style={styles.mainSubtitle}>
+              Define tu meta y predice tu resultado
+            </Text>
+
+          </View>
         </TouchableOpacity>
-      </View>
+
+        <Text style={styles.sectionTitle}>
+          Herramientas
+        </Text>
+
+        <View style={styles.grid}>
+
+          <DashboardCard
+            icon="📊"
+            title="Estadísticas"
+            subtitle="Ver progreso"
+            onPress={() =>
+              navigation.navigate(
+              "Estadisticas"
+              )
+            }
+          />
+
+          <DashboardCard
+            icon="📅"
+            title="Historial"
+            subtitle="Simulaciones"
+            onPress={() =>
+              navigation.navigate(
+                "Historial"
+              )
+            }
+          />
+
+          <DashboardCard
+            icon="💡"
+            title="Consejos"
+            subtitle="Acción correctiva"
+            onPress={() =>
+              navigation.navigate(
+                "Recomendaciones"
+              )
+            }
+          />
+
+          <DashboardCard
+            icon="👤"
+            title="Perfil"
+            subtitle="Ver cuenta"
+            onPress={() =>
+              navigation.navigate("Perfil")
+            }
+          />
+
+        </View>
+
+      </ScrollView>
 
     </View>
   );
 }
 
-function PressCard({ icon, title }) {
+function DashboardCard({
+  icon,
+  title,
+  subtitle,
+  onPress,
+}) {
+
   return (
-    <TouchableOpacity style={styles.card}>
-      <Text style={styles.cardIcon}>{icon}</Text>
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.cardSub}>Bloqueado</Text>
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.85}
+      onPress={onPress}
+    >
+
+      <Text style={styles.cardIcon}>
+        {icon}
+      </Text>
+
+      <Text style={styles.cardTitle}>
+        {title}
+      </Text>
+
+      <Text style={styles.cardSubtitle}>
+        {subtitle}
+      </Text>
+
     </TouchableOpacity>
   );
 }
 
-const styles = {
+const styles = StyleSheet.create({
+
+  wrapper: {
+    flex: 1,
+    backgroundColor: "#F3F4F6",
+  },
+
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
-    padding: 20
+    padding: 20,
+  },
+
+  headerSection: {
+    marginBottom: 24,
   },
 
   title: {
-    fontSize: 26,
+    fontSize: 30,
     fontWeight: "bold",
-    color: "#111827"
+    color: "#111827",
   },
 
   subtitle: {
+    marginTop: 6,
+    fontSize: 15,
     color: "#6B7280",
-    marginBottom: 20
   },
 
-  bigCard: {
-    backgroundColor: "#2563EB", 
-    padding: 24,
-    borderRadius: 20,
+  mainCard: {
+    backgroundColor: "#2563EB",
+
+    borderRadius: 24,
+
+    paddingVertical: 30,
+    paddingHorizontal: 24,
+
     alignItems: "center",
-    marginBottom: 20,
+
+    marginBottom: 28,
 
     shadowColor: "#2563EB",
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 5
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+
+    elevation: 6,
   },
 
-  bigIcon: {
-    fontSize: 34,
-    color: "white",
-    marginBottom: 5
+  mainIcon: {
+    fontSize: 38,
+    color: "#FFFFFF",
+    marginBottom: 10,
   },
 
-  bigTitle: {
-    color: "white",
+  mainTitle: {
+    fontSize: 20,
     fontWeight: "bold",
-    fontSize: 16
+    color: "#FFFFFF",
+    marginBottom: 6,
   },
 
-  bigSub: {
+  mainSubtitle: {
     color: "#DBEAFE",
-    fontSize: 12,
-    textAlign: "center"
+    textAlign: "center",
+    fontSize: 14,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#111827",
+
+    marginBottom: 16,
   },
 
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
 
   card: {
     width: "48%",
+
     backgroundColor: "#FFFFFF",
-    padding: 18,
-    borderRadius: 16,
-    marginBottom: 15,
+
+    borderRadius: 18,
+
+    paddingVertical: 24,
+    paddingHorizontal: 14,
+
     alignItems: "center",
+
+    marginBottom: 16,
 
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 8,
-    elevation: 2
+
+    elevation: 3,
   },
 
   cardIcon: {
-    fontSize: 28,
-    marginBottom: 8
+    fontSize: 30,
+    marginBottom: 10,
   },
 
   cardTitle: {
+    fontSize: 15,
     fontWeight: "bold",
-    color: "#111827"
+    color: "#111827",
+    marginBottom: 4,
   },
 
-  cardSub: {
+  cardSubtitle: {
+    fontSize: 12,
     color: "#6B7280",
-    fontSize: 12
-  }
-};
+    textAlign: "center",
+  },
+
+});

@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "objetivo": "Examen Final",
+    "riesgo": 67,
+    "estado": "Vas justo 🟡"
+  },
+  {
+    "id": 2,
+    "objetivo": "Proyecto React",
+    "riesgo": 40,
+    "estado": "Vas bien 🟢"
+  },
+  {
+    "id": 3,
+    "objetivo": "Tarea UX",
+    "riesgo": 90,
+    "estado": "Muy justo 🔴"
+  },
+  {
+    "id": 4,
+    "objetivo": "Entrega App Móvil",
+    "riesgo": 100,
+    "estado": "No te alcanza ⚫"
+  },
+  {
+    "id": 5,
+    "objetivo": "Examen Parcial",
+    "riesgo": 55,
+    "estado": "Vas bien 🟢"
+  }
+]

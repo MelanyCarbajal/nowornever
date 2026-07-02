@@ -1,93 +1,102 @@
-import React, { useState } from "react";
-import { View, Text } from "react-native";
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-// Screens
+
+import Inicio from "./screens/Inicio";
 import Login from "./screens/Login";
 import Registro from "./screens/Registro";
 import Home from "./screens/Home";
-import Inicio from "./screens/Inicio";
 import Perfil from "./screens/Perfil";
+import NuevaSimulacion from "./screens/NuevaSimulacion";
+import Recomendaciones from "./screens/Recomendaciones";
+import Resultado from "./screens/Resultado";
+import Estadisticas from "./screens/Estadisticas";
+import Historial from "./screens/Historial";
 
-// Header
-import Header from "./components/Header";
+const Stack = createNativeStackNavigator();
+
+const Tab = createBottomTabNavigator();
+
+/* =========================
+   NAVEGACIÓN PRIVADA (TABS)
+========================= */
+
+function PrivateTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+
+        tabBarStyle: {
+          height: 60,
+          paddingBottom: 5,
+        },
+
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarLabel: "Inicio",
+        }}
+      />
+
+      <Tab.Screen
+        name="NuevaSimulacion"
+        component={NuevaSimulacion}
+        options={{
+          tabBarLabel: "Simular",
+        }}
+      />
+
+      <Tab.Screen
+        name="Recomendaciones"
+        component={Recomendaciones}
+        options={{
+          tabBarLabel: "Consejos",
+        }}
+      />
+
+      <Tab.Screen
+        name="Perfil"
+        component={Perfil}
+        options={{
+          tabBarLabel: "Perfil",
+        }}
+      />
+
+    </Tab.Navigator>
+  );
+}
 
 export default function App() {
-
-  const [screen, setScreen] = useState("inicio");
-  const [user, setUser] = useState(null);
-  const [users, setUsers] = useState([]);
-
-  const renderScreen = () => {
-
-    console.log("SCREEN ACTUAL:", screen);
-
-    switch (screen) {
-
-      case "inicio":
-        return <Inicio setScreen={setScreen} />;
-
-      case "login":
-        return (
-          <Login
-            setScreen={setScreen}
-            setUser={setUser}
-            users={users}
-          />
-        );
-
-      case "registro":
-        return (
-          <Registro
-            setScreen={setScreen}
-            users={users}
-            setUsers={setUsers}
-          />
-        );
-
-      case "home":
-        return (
-          <Home
-            setScreen={setScreen}
-            user={user}
-          />
-        );
-
-      case "perfil":
-        return (
-          <Perfil
-            setScreen={setScreen}
-            user={user}
-          />
-        );
-
-      default:
-        return (
-          <View style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#F3E8FF"
-          }}>
-            <Text style={{ color: "red", fontWeight: "bold" }}>
-              ❌ Screen no existe: {screen}
-            </Text>
-          </View>
-        );
-    }
-  };
-
   return (
-    <View style={{ flex: 1 }}>
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName="Inicio"
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        {/* =========================
+            RUTAS PÚBLICAS
+        ========================= */}
 
-      {/* Muestra header en todas las pantallas excepto inicio, login y registro */ }
-      {screen !== "inicio" &&
-       screen !== "login" &&
-       screen !== "registro" && (
-        <Header setScreen={setScreen} />
-      )}
-
-      {renderScreen()}
-
-    </View>
+        <Stack.Screen name="Inicio" component={Inicio} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Registro" component={Registro} />
+        <Stack.Screen name="PrivateTabs" component={PrivateTabs} />
+        <Stack.Screen name="Resultado" component={Resultado} />
+        <Stack.Screen name="Historial" component={Historial} />
+        <Stack.Screen name="Estadisticas" component={Estadisticas} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }

@@ -1,67 +1,80 @@
 import React from "react";
-import { TouchableOpacity, Text } from "react-native";
+
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
 export default function Button({
   title,
   onPress,
-  variant = "primary", 
-  disabled = false
+  variant = "primary",
+  disabled = false,
 }) {
+ 
+  const buttonStyle = [
+    styles.button,
 
-  const getBackground = () => {
-    if (disabled) return "#9CA3AF";
+    variant === "danger" && styles.dangerButton,
 
-    switch (variant) {
-      case "danger":
-        return "#EF4444";
-      case "outline":
-        return "transparent";
-      default:
-        return "#2563EB"; 
-    }
-  };
+    variant === "outline" && styles.outlineButton,
 
-  const getTextColor = () => {
-    if (variant === "outline") return "#2563EB";
-    return "white";
-  };
+    disabled && styles.disabledButton,
+  ];
+
+  const textStyle = [styles.text, variant === "outline" && styles.outlineText];
 
   return (
     <TouchableOpacity
+      activeOpacity={0.85}
       onPress={onPress}
-      activeOpacity={0.8}
       disabled={disabled}
-      style={[
-        styles.button,
-        {
-          backgroundColor: getBackground(),
-          borderWidth: variant === "outline" ? 1 : 0,
-          borderColor: "#2563EB",
-          opacity: disabled ? 0.7 : 1
-        }
-      ]}
+      style={buttonStyle}
     >
-      <Text style={[styles.text, { color: getTextColor() }]}>
-        {title}
-      </Text>
+      <Text style={textStyle}>{title}</Text>
     </TouchableOpacity>
   );
 }
 
-const styles = {
+const styles = StyleSheet.create({
   button: {
-    padding: 15,
+    backgroundColor: "#2563EB",
+
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+
     borderRadius: 14,
+
     alignItems: "center",
 
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 6,
-    elevation: 3
+
+    elevation: 3,
+  },
+
+  dangerButton: {
+    backgroundColor: "#EF4444",
+  },
+
+  outlineButton: {
+    backgroundColor: "transparent",
+
+    borderWidth: 1,
+    borderColor: "#2563EB",
+  },
+
+  disabledButton: {
+    backgroundColor: "#9CA3AF",
+    opacity: 0.7,
   },
 
   text: {
+    color: "#FFFFFF",
+
+    fontSize: 15,
     fontWeight: "bold",
-    fontSize: 15
-  }
-};
+  },
+
+  outlineText: {
+    color: "#2563EB",
+  },
+});
