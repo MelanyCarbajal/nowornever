@@ -5,11 +5,11 @@ export const ThemeContext = createContext();
 
 export const lightTheme = {
   mode: "light",
-  background: "#F3F4F6", // Fondo gris claro muy premium, tipo Notion/Linear
+  background: "#F3F4F6", 
   card: "#FFFFFF",
-  text: "#111827", // Texto profundo casi negro para máxima legibilidad
+  text: "#111827", 
   textSecondary: "#4B5563",
-  primary: "#4F46E5", // Azul Indigo formal y muy profesional
+  primary: "#4F46E5", 
   danger: "#EF4444",
   success: "#10B981",
   warning: "#F59E0B",
@@ -19,29 +19,22 @@ export const lightTheme = {
 
 export const darkTheme = {
   mode: "dark",
-  background: "#111827", // Gris oscuro súper profundo y limpio
+  background: "#111827", 
   card: "#1F2937",
   text: "#F9FAFB",
   textSecondary: "#9CA3AF",
-  primary: "#6366F1", // Azul indigo más suave para contraste en oscuro
-
+  primary: "#6366F1", 
   danger: "#FB7185",
   success: "#34D399",
   warning: "#FBBF24",
   border: "#334155",
-  inputBackground: "#0F172A", // or slightly lighter #1E293B
+  inputBackground: "#0F172A", 
 };
 
 export const ThemeProvider = ({ children }) => {
   const systemColorScheme = useColorScheme();
-  
-  // By default, match system, but allow override
-  const [isDarkMode, setIsDarkMode] = useState(systemColorScheme === "dark");
 
-  // Optional: Listen to system changes if we want to force it
-  // useEffect(() => {
-  //   setIsDarkMode(systemColorScheme === "dark");
-  // }, [systemColorScheme]);
+  const [isDarkMode, setIsDarkMode] = useState(systemColorScheme === "dark");
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);

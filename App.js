@@ -25,8 +25,7 @@ import CustomTabBar from "./components/CustomTabBar";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// [SUPERVISOR MODE]: Cambia a 'false' si el jefe no aprueba el menú flotante
-const USE_CUSTOM_NAVBAR = true;
+
 
 /* =========================
    STACKS ANIDADOS (Para mantener el Navbar visible)

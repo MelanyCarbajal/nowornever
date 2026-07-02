@@ -5,7 +5,7 @@ import { Ionicons as Icon } from "@expo/vector-icons";
 
 export default function Calendario({ navigation }) {
   const { theme, isDarkMode } = useContext(ThemeContext);
-  // Datos simulados de eventos o plazos
+  // Datos simulados de eventos 
   const eventos = [
     { id: 1, fecha: "15 Oct", titulo: "Examen Final de Física", tipo: "crítico" },
     { id: 2, fecha: "20 Oct", titulo: "Entrega de Proyecto React", tipo: "moderado" },
