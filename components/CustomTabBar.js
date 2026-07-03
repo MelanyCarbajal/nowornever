@@ -79,6 +79,9 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 0,
+    elevation: 0,
+    pointerEvents: "box-none",
   },
   container: {
     flexDirection: "row",
@@ -92,8 +95,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 20,
     elevation: 8,
+    zIndex: 10,
     width: "100%",
     maxWidth: 400,
+    pointerEvents: "auto",
   },
   tabBtn: {
     flexDirection: "row",

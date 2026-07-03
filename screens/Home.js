@@ -58,13 +58,6 @@ export default function Home({ navigation, route }) {
             onPress={() => navigation.navigate("Recomendaciones")}
             theme={theme}
           />
-          <DashboardCard
-            icon="person"
-            title="Perfil"
-            subtitle="Ver cuenta"
-            onPress={() => navigation.navigate("Perfil")}
-            theme={theme}
-          />
           </View>
         </View>
       </ScrollView>

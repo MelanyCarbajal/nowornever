@@ -1,139 +1,266 @@
 import React, { useState, useContext } from "react";
-import { View, Text, TextInput, Alert, StyleSheet, TouchableOpacity, ScrollView, Platform } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Platform,
+  Image,
+} from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+
 import Button from "../components/Button";
 import { ThemeContext } from "../context/ThemeContext";
 
-export default function NuevaSimulacion({ navigation }) {
+export default function NuevaSimulacion({ navigation, route = {} }) {
+  const foto = route?.params?.foto;
   const { theme } = useContext(ThemeContext);
+
+  // HOY (normalizado)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const [objetivo, setObjetivo] = useState("");
-  const [fechaLimite, setFechaLimite] = useState(new Date());
+  const [fechaLimite, setFechaLimite] = useState(today);
+  const [fechaTexto, setFechaTexto] = useState(
+    today.toISOString().split("T")[0]
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [horas, setHoras] = useState("");
   const [nivel, setNivel] = useState("");
 
+  // FIX PICKER
   const onChangeDate = (event, selectedDate) => {
-    const currentDate = selectedDate || fechaLimite;
-    setShowDatePicker(Platform.OS === 'ios');
-    setFechaLimite(currentDate);
+    if (Platform.OS !== "ios") {
+      setShowDatePicker(false);
+    }
+    if (event.type === "dismissed") return;
+    if (!selectedDate) return;
+
+    const cleanDate = new Date(selectedDate);
+    cleanDate.setHours(0, 0, 0, 0);
+
+    if (cleanDate < today) {
+      Alert.alert("Fecha inválida", "No puedes seleccionar fechas pasadas.");
+      return;
+    }
+    setFechaLimite(cleanDate);
+    setFechaTexto(
+      cleanDate.toISOString().split("T")[0]
+    );
   };
 
   const handleSimular = () => {
-    if (!objetivo || !horas || !nivel) {
+    console.log("CLICK SIMULAR");
+
+    if (!objetivo.trim() || !horas.trim() || !nivel.trim()) {
       Alert.alert("Campos incompletos", "Completa todos los campos.");
       return;
     }
 
-    const horasNum = parseFloat(horas);
-    const nivelNum = parseInt(nivel);
+    const horasNumero = Number(horas);
+    const nivelNumero = Number(nivel);
 
-    if (isNaN(horasNum) || isNaN(nivelNum) || nivelNum < 1 || nivelNum > 10) {
-      Alert.alert("Error", "Horas deben ser número. Nivel de 1 a 10.");
+    if (horasNumero <= 0 || nivelNumero <= 0) {
+      Alert.alert("Error", "Horas y nivel deben ser mayores a 0");
       return;
     }
 
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    const limite = new Date(fechaLimite);
-    limite.setHours(0, 0, 0, 0);
+    const fecha = new Date(fechaLimite);
+    fecha.setHours(0, 0, 0, 0);
 
-    const diasRestantes = Math.ceil((limite.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+    const diasRestantes = Math.max(
+      0,
+      Math.ceil((fecha - hoy) / (1000 * 60 * 60 * 24))
+    );
 
-    if (diasRestantes < 0) {
-      Alert.alert("Fecha inválida", "La fecha límite ya pasó.");
-      return;
-    }
+    const horasEfectivas = diasRestantes * horasNumero;
 
-    const factorProcrastinacion = 1 - (nivelNum / 10) * 0.6;
-    const factorSeguro = Math.max(0.1, Math.min(1, factorProcrastinacion));
-    const horasEfectivas = horasNum * factorSeguro;
-    const capacidadTotal = Math.max(1, diasRestantes) * 8; // asumiendo 8 horas max por día real
-    const riesgoCalculado = (horasNum) / capacidadTotal * 100;
-    const riesgoReal = Math.min(Math.max(riesgoCalculado * (nivelNum / 5), 10), 100);
+    const riesgo = Math.min(100, nivelNumero * 10);
 
     let estado = "";
     let mensaje = "";
 
-    if (riesgoReal < 60) {
-      estado = "Vas bien 🟢";
-      mensaje = "Tienes buen margen de tiempo";
-    } else if (riesgoReal < 85) {
-      estado = "Vas justo 🟡";
-      mensaje = "Organízate mejor";
-    } else if (riesgoReal <= 100) {
-      estado = "Muy justo 🔴";
-      mensaje = "Estás al límite";
+    if (riesgo <= 30) {
+      estado = "✅ Vas bien";
+      mensaje = "Continúa con tu ritmo.";
+    } else if (riesgo <= 60) {
+      estado = "⚠️ Vas justo";
+      mensaje = "Organiza mejor tus horas.";
+    } else if (riesgo <= 80) {
+      estado = "🟠 Alto riesgo";
+      mensaje = "Empieza cuanto antes.";
     } else {
-      estado = "No te alcanza ⚫";
-      mensaje = "Necesitas más tiempo o menos carga";
+      estado = "🔴 Muy alto riesgo";
+      mensaje = "Necesitas actuar inmediatamente.";
     }
 
-    const horasEnteras = Math.floor(horasEfectivas);
-    const minutos = Math.round((horasEfectivas - horasEnteras) * 60);
-
     navigation.navigate("Resultado", {
-      objetivo, diasRestantes, horasEfectivas, horasEnteras, minutos,
-      riesgo: riesgoReal, estado, mensaje, sobrecarga: riesgoReal > 100,
+      objetivo,
+      diasRestantes,
+      horasEfectivas,
+      riesgo,
+      estado,
+      mensaje,
     });
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.background }]} contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: theme.background }}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={[styles.card, { backgroundColor: theme.card }]}>
-        <Text style={[styles.title, { color: theme.text }]}>Nueva Simulación</Text>
-        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          Ingresa los datos para predecir tu escenario y calcular el punto de no retorno.
+        <Text style={[styles.title, { color: theme.text }]}>
+          Nueva Simulación
         </Text>
 
+        {/* OBJETIVO */}
         <TextInput
-          style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border }]}
-          placeholder="Objetivo (ej. Examen Final)"
+          style={[
+            styles.input,
+            {
+              color: theme.text,
+              backgroundColor: theme.inputBackground,
+              borderColor: theme.border,
+            },
+          ]}
+          placeholder="Objetivo"
           placeholderTextColor={theme.textSecondary}
           value={objetivo}
           onChangeText={setObjetivo}
         />
 
-        <TouchableOpacity 
-          style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, justifyContent: 'center' }]} 
-          onPress={() => setShowDatePicker(true)}
-        >
-          <Text style={{ color: theme.text }}>
-            Fecha Límite: {fechaLimite.toISOString().split('T')[0]}
-          </Text>
-        </TouchableOpacity>
+        {Platform.OS === "web" ? (
+          <TextInput
+            style={[
+              styles.input,
+              {
+                color: theme.text,
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.border,
+              },
+            ]}
+            placeholder="AAAA-MM-DD"
+            placeholderTextColor={theme.textSecondary}
+            value={fechaTexto}
+            onChangeText={(text) => {
+              setFechaTexto(text);
 
-        {showDatePicker && (
-          <DateTimePicker
-            testID="dateTimePicker"
-            value={fechaLimite}
-            mode="date"
-            is24Hour={true}
-            display="default"
-            onChange={onChangeDate}
-            minimumDate={new Date()}
+              if (text.length !== 10) return;
+
+              const parsed = new Date(text);
+
+              if (isNaN(parsed.getTime())) return;
+
+              parsed.setHours(0, 0, 0, 0);
+
+              if (parsed < today) {
+                Alert.alert(
+                  "Fecha inválida",
+                  "No puedes usar fechas pasadas."
+                );
+                return;
+              }
+
+              setFechaLimite(parsed);
+            }}
           />
+        ) : (
+          <>
+            <TouchableOpacity
+              onPress={() => setShowDatePicker(true)}
+              style={[
+                styles.input,
+                {
+                  justifyContent: "center",
+                  backgroundColor: theme.inputBackground,
+                  borderColor: theme.border,
+                },
+              ]}
+            >
+              <Text style={{ color: theme.text }}>
+                📅 Fecha: {fechaLimite.toLocaleDateString()}
+              </Text>
+            </TouchableOpacity>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={fechaLimite}
+                mode="date"
+                display="default"
+                minimumDate={today}
+                onChange={onChangeDate}
+              />
+            )}
+          </>
         )}
 
+        {/* HORAS */}
         <TextInput
-          style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border }]}
-          placeholder="Horas que crees necesitar"
+          style={[
+            styles.input,
+            {
+              color: theme.text,
+              backgroundColor: theme.inputBackground,
+              borderColor: theme.border,
+            },
+          ]}
+          placeholder="Horas"
           placeholderTextColor={theme.textSecondary}
           keyboardType="numeric"
           value={horas}
           onChangeText={setHoras}
         />
 
+        {/* NIVEL */}
         <TextInput
-          style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border }]}
-          placeholder="Nivel de procrastinación (1-10)"
+          style={[
+            styles.input,
+            {
+              color: theme.text,
+              backgroundColor: theme.inputBackground,
+              borderColor: theme.border,
+            },
+          ]}
+          placeholder="Nivel (1-10)"
           placeholderTextColor={theme.textSecondary}
           keyboardType="numeric"
           value={nivel}
           onChangeText={setNivel}
         />
 
-        <View style={{ height: 20 }} />
+        {/* BOTÓN CÁMARA */}
+        <TouchableOpacity
+          style={styles.cameraBtn}
+          onPress={() => navigation.navigate("CamaraEvidencia")}
+        >
+          <Text style={{ color: "white", fontWeight: "bold" }}>
+            📸 Tomar evidencia
+          </Text>
+        </TouchableOpacity>
+
+        {/* PREVIEW DE FOTO */}
+        {foto && (
+          <View style={{ marginBottom: 15, alignItems: "center" }}>
+            <Image
+              source={{ uri: foto }}
+              style={{ width: 200, height: 200, borderRadius: 15 }}
+            />
+            <Text style={{ color: theme.text, marginTop: 5 }}>
+              📸 Evidencia agregada
+            </Text>
+          </View>
+        )}
+
+        {/* BOTÓN SIMULAR */}
         <Button title="Calcular Escenario" onPress={handleSimular} />
       </View>
     </ScrollView>
@@ -142,43 +269,30 @@ export default function NuevaSimulacion({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
     padding: 20,
+    alignItems: "stretch",
   },
   card: {
-    padding: 30,
-    borderRadius: 24,
-    width: "100%",
-    maxWidth: 360,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3
+    padding: 25,
+    borderRadius: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center"
-  },
-  subtitle: {
-    marginBottom: 24,
+    marginBottom: 20,
     textAlign: "center",
-    fontSize: 14,
-    lineHeight: 20
   },
   input: {
-    padding: 16,
-    borderRadius: 14,
-    marginBottom: 16,
-    width: "100%",
+    padding: 14,
     borderWidth: 1,
-    fontSize: 16,
-  }
+    borderRadius: 12,
+    marginBottom: 15,
+  },
+  cameraBtn: {
+    backgroundColor: "#000",
+    padding: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 15,
+  },
 });
-

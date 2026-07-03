@@ -1,78 +1,124 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import Button from "../components/Button";
 import { ThemeContext } from "../context/ThemeContext";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
 
 export default function Login({ navigation, route }) {
   const { theme } = useContext(ThemeContext);
-  const [username, setUsername] = useState("");
+
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
 
   useEffect(() => {
-    if (route.params?.registeredUser) {
-      setUsername(route.params.registeredUser);
+    if (route.params?.registeredEmail) {
+      setEmail(route.params.registeredEmail);
     }
   }, [route.params]);
 
   const showMessage = (text, type = "error") => {
     setMessage(text);
     setMessageType(type);
+
     setTimeout(() => {
       setMessage("");
       setMessageType("");
     }, 2000);
   };
 
-  const handleLogin = () => {
-    if (!username.trim() || !password.trim()) {
-      showMessage("Completa todos los campos", "error");
-      return;
-    }
+const handleLogin = async () => {
+  if (!email.trim() || !password.trim()) {
+    showMessage("Completa todos los campos", "error");
+    return;
+  }
 
-    showMessage(`¡Bienvenid@, ${username}!`, "success");
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
 
-    setTimeout(() => {
-      navigation.navigate("PrivateTabs", {
-        screen: "Home",
-        params: { username: username },
-      });
-    }, 1200);
-  };
+    console.log("Login OK:", userCredential.user);
+
+    showMessage("Inicio de sesión correcto", "success");
+
+    // NO navigation.replace("PrivateTabs")
+    // Firebase detectará automáticamente el usuario
+    // gracias a onAuthStateChanged() en App.js
+
+  } catch (error) {
+    console.log(error.code);
+
+    Alert.alert(
+      "Error",
+      "Correo o contraseña incorrectos"
+    );
+  }
+};
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
+
       {message !== "" && (
-        <View style={[styles.toast, { backgroundColor: messageType === "error" ? theme.danger : theme.success }]}>
+        <View
+          style={[
+            styles.toast,
+            { backgroundColor: messageType === "error" ? theme.danger : theme.success },
+          ]}
+        >
           <Text style={styles.toastText}>{message}</Text>
         </View>
       )}
 
       <View style={[styles.card, { backgroundColor: theme.card }]}>
-        <Text style={[styles.title, { color: theme.text }]}>Iniciar Sesión</Text>
+        <Text style={[styles.title, { color: theme.text }]}>
+          Iniciar Sesión
+        </Text>
 
+        {/* EMAIL */}
         <TextInput
-          placeholder="Usuario"
+          placeholder="Email"
           placeholderTextColor={theme.textSecondary}
-          value={username}
-          onChangeText={setUsername}
-          style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border }]}
+          value={email}
+          onChangeText={setEmail}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.inputBackground,
+              color: theme.text,
+              borderColor: theme.border,
+            },
+          ]}
         />
 
+        {/* PASSWORD */}
         <TextInput
           placeholder="Contraseña"
           placeholderTextColor={theme.textSecondary}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
-          style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border }]}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.inputBackground,
+              color: theme.text,
+              borderColor: theme.border,
+            },
+          ]}
         />
 
         <Button title="Entrar" onPress={handleLogin} />
 
         <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
-          <Text style={[styles.link, { color: theme.primary }]}>Crear cuenta</Text>
+          <Text style={[styles.link, { color: theme.primary }]}>
+            Crear cuenta
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

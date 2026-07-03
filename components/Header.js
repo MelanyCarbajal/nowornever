@@ -26,12 +26,12 @@ export default function Header({ navigation }) {
         </View>
 
         {/* BOTÓN CERRAR SESIÓN */}
-        <TouchableOpacity 
+        {/* <TouchableOpacity 
           style={[styles.logoutButton, { backgroundColor: theme.danger + "20" }]} 
           onPress={handleLogout}
         >
           <Text style={[styles.logoutText, { color: theme.danger }]}>Salir</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );

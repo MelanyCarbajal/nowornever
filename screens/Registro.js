@@ -1,19 +1,19 @@
 import React, { useState, useContext } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native";
 import Button from "../components/Button";
 import { ThemeContext } from "../context/ThemeContext";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
 
-export default function Registro({ navigation, route }) {
+export default function Registro({ navigation }) {
   const { theme } = useContext(ThemeContext);
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
-
-  const validateEmail = (emailText) => /\S+@\S+\.\S+/.test(emailText);
-  const emailValido = email.length > 0 && validateEmail(email);
-  const passwordValida = password.length >= 6;
 
   const showMessage = (text, type = "error") => {
     setMessage(text);
@@ -24,39 +24,50 @@ export default function Registro({ navigation, route }) {
     }, 2000);
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!username.trim() || !email.trim() || !password.trim()) {
       showMessage("Completa todos los campos", "error");
       return;
     }
-    if (username.length < 3) {
-      showMessage("El usuario debe tener mínimo 3 caracteres", "error");
-      return;
-    }
-    if (!validateEmail(email)) {
-      showMessage("Correo electrónico inválido", "error");
-      return;
-    }
-    if (password.length < 6) {
-      showMessage("La contraseña debe tener mínimo 6 caracteres", "error");
+
+    if (username.trim().length < 3) {
+      showMessage("El usuario debe tener al menos 3 caracteres", "error");
       return;
     }
 
-    showMessage("Cuenta creada correctamente", "success");
-    setTimeout(() => {
-      navigation.navigate("Login", { registeredUser: username });
-    }, 1200);
+    try {
+      await createUserWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
+      );
+
+      showMessage("Cuenta creada con éxito", "success");
+
+
+    } catch (error) {
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          showMessage("Ese correo ya está registrado", "error");
+          break;
+
+        case "auth/invalid-email":
+          showMessage("Correo electrónico inválido", "error");
+          break;
+
+        case "auth/weak-password":
+          showMessage("La contraseña debe tener al menos 6 caracteres", "error");
+          break;
+
+        default:
+          Alert.alert("Error", error.message);
+      }
+    }
   };
-
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent} style={[styles.container, { backgroundColor: theme.background }]}>
-      {message !== "" && (
-        <View style={[styles.toast, { backgroundColor: messageType === "error" ? theme.danger : theme.success }]}>
-          <Text style={styles.toastText}>{message}</Text>
-        </View>
-      )}
-
+    <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={[styles.card, { backgroundColor: theme.card }]}>
+
         <Text style={[styles.title, { color: theme.text }]}>Crear Cuenta</Text>
 
         <TextInput
@@ -64,27 +75,32 @@ export default function Registro({ navigation, route }) {
           placeholderTextColor={theme.textSecondary}
           value={username}
           onChangeText={setUsername}
-          style={[styles.input, { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border }]}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.inputBackground,
+              color: theme.text,
+              borderColor: theme.border,
+            },
+          ]}
         />
 
         <TextInput
-          placeholder="Correo electrónico"
+          placeholder="Correo"
           placeholderTextColor={theme.textSecondary}
-          keyboardType="email-address"
           autoCapitalize="none"
+          keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
           style={[
             styles.input,
-            { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border },
-            email.length > 0 && { borderColor: emailValido ? theme.success : theme.danger }
+            {
+              backgroundColor: theme.inputBackground,
+              color: theme.text,
+              borderColor: theme.border,
+            },
           ]}
         />
-        {email.length > 0 && (
-          <Text style={[styles.helperText, { color: emailValido ? theme.success : theme.danger }]}>
-            {emailValido ? "Correo válido" : "Formato de correo incorrecto"}
-          </Text>
-        )}
 
         <TextInput
           placeholder="Contraseña"
@@ -94,22 +110,21 @@ export default function Registro({ navigation, route }) {
           onChangeText={setPassword}
           style={[
             styles.input,
-            { backgroundColor: theme.inputBackground, color: theme.text, borderColor: theme.border },
-            password.length > 0 && { borderColor: passwordValida ? theme.success : theme.danger }
+            {
+              backgroundColor: theme.inputBackground,
+              color: theme.text,
+              borderColor: theme.border,
+            },
           ]}
         />
-        {password.length > 0 && (
-          <Text style={[styles.helperText, { color: passwordValida ? theme.success : theme.danger }]}>
-            {passwordValida ? "Contraseña segura" : "Mínimo 6 caracteres"}
-          </Text>
-        )}
-
-        <View style={{ height: 10 }} />
         <Button title="Crear cuenta" onPress={handleRegister} />
 
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={[styles.link, { color: theme.primary }]}>Ya tengo una cuenta</Text>
+          <Text style={{ color: theme.primary, textAlign: "center", marginTop: 15 }}>
+            Ya tengo cuenta
+          </Text>
         </TouchableOpacity>
+
       </View>
     </ScrollView>
   );
