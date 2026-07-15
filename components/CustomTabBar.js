@@ -1,9 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, memo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons as Icon } from "@expo/vector-icons";
 import { ThemeContext } from "../context/ThemeContext";
 
-export default function CustomTabBar({ state, descriptors, navigation }) {
+const CustomTabBar = memo(({ state, descriptors, navigation }) => {
   const { theme, isDarkMode } = useContext(ThemeContext);
 
   return (
@@ -68,7 +68,7 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -114,3 +114,5 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   }
 });
+
+export default CustomTabBar;

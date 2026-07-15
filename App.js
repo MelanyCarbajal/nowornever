@@ -11,6 +11,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./config/firebase";
 
 import { ThemeProvider, ThemeContext } from "./context/ThemeContext";
+import { TimerProvider } from "./context/TimerContext";
+import { registrarForPushNotificationsAsync } from "./services/notificationService";
 
 import Inicio from "./screens/Inicio";
 import Login from "./screens/Login";
@@ -53,10 +55,13 @@ function HomeStack() {
 /* =========================
    PERFIL STACK
 ========================= */
+import EditarPerfil from "./screens/EditarPerfil";
+
 function PerfilStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="PerfilMain" component={Perfil} />
+      <Stack.Screen name="EditarPerfil" component={EditarPerfil} />
       <Stack.Screen name="Configuracion" component={Configuracion} />
       <Stack.Screen name="AcercaDe" component={AcercaDe} />
       <Stack.Screen name="Estadisticas" component={Estadisticas} />
@@ -125,15 +130,16 @@ function PrivateTabs() {
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Inicio" component={Inicio} />
+      {/* Login ahora es la pantalla principal/inicial */}
       <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Inicio" component={Inicio} />
       <Stack.Screen name="Registro" component={Registro} />
     </Stack.Navigator>
   );
 }
 
 /* =========================
-   APP STACK (🔥 CORREGIDO)
+   APP STACK 
 ========================= */
 function AppStack() {
   return (
@@ -166,6 +172,9 @@ function MainNavigation() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      if (currentUser) {
+        registrarForPushNotificationsAsync().catch(console.log);
+      }
     });
 
     return unsubscribe;
@@ -187,7 +196,9 @@ function MainNavigation() {
 export default function App() {
   return (
     <ThemeProvider>
-      <MainNavigation />
+      <TimerProvider>
+        <MainNavigation />
+      </TimerProvider>
     </ThemeProvider>
   );
 }

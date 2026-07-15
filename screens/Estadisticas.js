@@ -2,6 +2,9 @@ import React, { useEffect, useState, useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { ThemeContext } from "../context/ThemeContext";
 import { Ionicons as Icon } from "@expo/vector-icons";
+import { auth, db } from "../config/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Estadisticas({ navigation }) {
   const { theme, isDarkMode } = useContext(ThemeContext);
@@ -10,22 +13,41 @@ export default function Estadisticas({ navigation }) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    cargarDatos();
-  }, []);
-
-  const cargarDatos = async () => {
-    try {
-      setLoading(true);
-      setError(false);
-      const json = require("../assets/data/estadisticas.json");
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      setData(json);
-    } catch (e) {
-      setError(true);
-    } finally {
+    const user = auth.currentUser;
+    if (!user) {
       setLoading(false);
+      return;
     }
-  };
+
+    AsyncStorage.getItem(`estadisticas_${user.uid}`).then(cached => {
+      if (cached) {
+        setData(JSON.parse(cached));
+        setLoading(false);
+      }
+    });
+
+    const unsubscribe = onSnapshot(doc(db, "users", user.uid), 
+      (docSnap) => {
+        if (docSnap.exists() && docSnap.data().simulaciones) {
+          const docs = docSnap.data().simulaciones;
+          setData(docs);
+          setLoading(false);
+          setError(false);
+          AsyncStorage.setItem(`estadisticas_${user.uid}`, JSON.stringify(docs));
+        } else {
+          setData([]);
+          setLoading(false);
+        }
+      }, 
+      (err) => {
+        console.error("Error cargando estadísticas", err);
+        if (data.length === 0) setError(true);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   if (loading) {
     return (
@@ -73,6 +95,14 @@ export default function Estadisticas({ navigation }) {
         <Text style={styles.mainValue}>{data.length}</Text>
         <Text style={styles.subText}>Sigue mejorando tu productividad 🚀</Text>
       </TouchableOpacity>
+
+      {/* 
+        TODO (Gamificación - Sistema de Castigos): 
+        1. Agregar aquí un componente de "Energía" o "Nivel de Disciplina" (ej. Barra de vida).
+        2. Esa variable debe venir de Firebase (ej. user.disciplina).
+        3. Si el usuario se rinde en Calendario.js, restar puntos a esa variable y actualizar Firebase.
+        4. Si el nivel de disciplina llega a 0%, cambiar el color principal a rojo o bloquear la app temporalmente.
+      */}
 
       <View style={styles.grid}>
         {/* PROMEDIO */}

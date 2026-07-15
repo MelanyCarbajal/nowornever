@@ -2,8 +2,10 @@ import React, { useState, useContext } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native";
 import Button from "../components/Button";
 import { ThemeContext } from "../context/ThemeContext";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, db } from "../config/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Registro({ navigation }) {
   const { theme } = useContext(ThemeContext);
@@ -36,19 +38,32 @@ export default function Registro({ navigation }) {
     }
 
     try {
-      await createUserWithEmailAndPassword(
+
+      await AsyncStorage.setItem("pending_username", username.trim());
+
+      showMessage("Usuario creado", "success");
+
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      const userCred = await createUserWithEmailAndPassword(
         auth,
         email.trim(),
         password
       );
 
-      showMessage("Cuenta creada con éxito", "success");
 
+      await updateProfile(userCred.user, { displayName: username.trim() });
+
+      await setDoc(doc(db, "users", userCred.user.uid), {
+        username: username.trim(),
+        email: email.trim(),
+        createdAt: new Date().toISOString()
+      }, { merge: true });
 
     } catch (error) {
       switch (error.code) {
         case "auth/email-already-in-use":
-          showMessage("Ese correo ya está registrado", "error");
+          showMessage("Usuario ya registrado", "error");
           break;
 
         case "auth/invalid-email":
@@ -65,10 +80,17 @@ export default function Registro({ navigation }) {
     }
   };
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
-      <View style={[styles.card, { backgroundColor: theme.card }]}>
+    <View style={styles.container}>
+      {message ? (
+        <View style={[styles.toast, { backgroundColor: messageType === "error" ? theme.danger : theme.success }]}>
+          <Text style={styles.toastText}>{message}</Text>
+        </View>
+      ) : null}
+      
+      <ScrollView contentContainerStyle={styles.scrollContent} style={{ backgroundColor: theme.background }}>
+        <View style={[styles.card, { backgroundColor: theme.card }]}>
 
-        <Text style={[styles.title, { color: theme.text }]}>Crear Cuenta</Text>
+          <Text style={[styles.title, { color: theme.text }]}>Crear Cuenta</Text>
 
         <TextInput
           placeholder="Usuario"
@@ -127,6 +149,7 @@ export default function Registro({ navigation }) {
 
       </View>
     </ScrollView>
+    </View>
   );
 }
 

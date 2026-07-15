@@ -1,31 +1,76 @@
 import React, { useContext, useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Alert,
-  StyleSheet,
-  ScrollView
-} from "react-native";
-
+import { View, Text, Image, TouchableOpacity, Alert, StyleSheet, ScrollView } from "react-native";
 import Button from "../components/Button";
 import { ThemeContext } from "../context/ThemeContext";
 import { Ionicons as Icon } from "@expo/vector-icons";
 import { signOut } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { auth, db } from "../config/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
+import { useIsFocused } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Perfil({ navigation, route }) {
+export default function Perfil({ navigation }) {
   const { theme } = useContext(ThemeContext);
+  const isFocused = useIsFocused();
+  
+  const [tipo, setTipo] = useState("Cargando...");
+  const [userData, setUserData] = useState(auth.currentUser);
+  const [fotoPerfil, setFotoPerfil] = useState(auth.currentUser?.photoURL || null);
 
-  const [tipo, setTipo] = useState(null);
-
-  // seguridad total
   useEffect(() => {
-    if (route?.params?.tipo) {
-      setTipo(route.params.tipo);
+    // Actualizar foto y nombre cuando volvamos de editar perfil al instante
+    if (isFocused) {
+      setUserData({ ...auth.currentUser });
+      AsyncStorage.getItem("foto_perfil").then(cached => {
+        if (cached) setFotoPerfil(cached);
+      });
+      AsyncStorage.getItem("pending_username").then(pending => {
+        if (pending) setUserData(prev => ({ ...prev, displayName: pending }));
+      });
     }
-  }, [route]);
+  }, [isFocused]);
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+
+    AsyncStorage.getItem(`test_perfil_${user.uid}`).then(cached => {
+      if (cached) setTipo(cached);
+    });
+
+    const unsubscribe = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        
+        if (data.perfil_productividad) {
+          setTipo(data.perfil_productividad);
+          AsyncStorage.setItem(`test_perfil_${user.uid}`, data.perfil_productividad);
+        } else {
+          setTipo("Sin test realizado");
+        }
+
+
+        if (data.photoBase64) {
+          setFotoPerfil(data.photoBase64);
+          AsyncStorage.setItem("foto_perfil", data.photoBase64);
+        } else if (data.photoURL) {
+          setFotoPerfil(data.photoURL);
+        }
+
+        AsyncStorage.getItem("pending_username").then(pending => {
+          if (data.username && !pending) {
+            setUserData(prev => ({ ...prev, displayName: data.username }));
+          }
+        });
+
+      } else {
+        setTipo("Sin test realizado");
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -43,20 +88,28 @@ export default function Perfil({ navigation, route }) {
         {/* CARD PERFIL */}
         <View style={[styles.card, { backgroundColor: theme.card }]}>
           <Image
-            source={require("../assets/6073873.png")}
+            source={fotoPerfil ? { uri: fotoPerfil } : require("../assets/6073873.png")}
             style={styles.image}
           />
+          
+          <TouchableOpacity 
+            style={[styles.editBtn, { backgroundColor: theme.primary }]}
+            onPress={() => navigation.navigate("EditarPerfil")}
+          >
+            <Icon name="pencil" size={16} color="#FFF" style={{ marginRight: 6 }} />
+            <Text style={{ color: "#FFF", fontWeight: "bold", fontSize: 13 }}>Editar Perfil</Text>
+          </TouchableOpacity>
 
-          <Text style={[styles.title, { color: theme.text }]}>
-            Perfil del usuario
+          <Text style={[styles.title, { color: theme.text, marginTop: 14 }]}>
+            {userData?.displayName || userData?.email || "Usuario"}
           </Text>
 
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-            Categoría:
+            Perfil Psicológico:
           </Text>
 
-          <Text style={[styles.tipo]}>
-            {tipo || "Sin test realizado"}
+          <Text style={[styles.tipo, { color: theme.primary }]}>
+            {tipo}
           </Text>
         </View>
 
@@ -173,5 +226,15 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 16,
     fontWeight: "600"
+  },
+
+  editBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginTop: 10,
+    marginBottom: 5,
   }
 });

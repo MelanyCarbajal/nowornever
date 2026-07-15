@@ -1,12 +1,81 @@
-import React, { useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import React, { useContext, useEffect, useState, useCallback, memo } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from "react-native";
 import Header from "../components/Header";
 import { ThemeContext } from "../context/ThemeContext";
 import { Ionicons as Icon } from "@expo/vector-icons";
+import { auth, db } from "../config/firebase";
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { updateProfile } from "firebase/auth";
+import { useIsFocused } from "@react-navigation/native";
+
+const DashboardCard = memo(({ icon, title, subtitle, onPress, theme }) => {
+  return (
+    <TouchableOpacity
+      style={[styles.card, { backgroundColor: theme.card }]}
+      activeOpacity={0.85}
+      onPress={onPress}
+    >
+      <Icon name={icon} size={32} color={theme.primary} style={{ marginBottom: 10 }} />
+      <Text style={[styles.cardTitle, { color: theme.text }]}>{title}</Text>
+      <Text style={[styles.cardSubtitle, { color: theme.textSecondary }]}>{subtitle}</Text>
+    </TouchableOpacity>
+  );
+});
 
 export default function Home({ navigation, route }) {
   const { theme } = useContext(ThemeContext);
-  const nombreUsuario = route.params?.username || "Usuario";
+  const isFocused = useIsFocused();
+  const [nombreUsuario, setNombreUsuario] = useState(auth.currentUser?.displayName || auth.currentUser?.email || "");
+  const [fotoPerfil, setFotoPerfil] = useState(auth.currentUser?.photoURL || null);
+
+  useEffect(() => {
+    if (isFocused) {
+      cargarDatos();
+    }
+  }, [isFocused]);
+
+  const cargarDatos = useCallback(async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const cachedFoto = await AsyncStorage.getItem("foto_perfil");
+    if (cachedFoto) setFotoPerfil(cachedFoto);
+    
+    const pendingName = await AsyncStorage.getItem("pending_username");
+    if (pendingName) {
+      setNombreUsuario(pendingName);
+
+    }
+    await user.reload();
+    if (user.displayName && !pendingName) setNombreUsuario(user.displayName);
+
+
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        if (data.username && !pendingName) setNombreUsuario(data.username);
+        
+        if (data.photoBase64) {
+          setFotoPerfil(data.photoBase64);
+          AsyncStorage.setItem("foto_perfil", data.photoBase64);
+        } else if (data.photoURL && !cachedFoto) {
+          setFotoPerfil(data.photoURL);
+        }
+      }
+
+      if (pendingName) await AsyncStorage.removeItem("pending_username");
+    } catch (error) {
+      console.log("Error leyendo Firestore en Home", error);
+    }
+  }, []);
+
+  const goSimulacion = useCallback(() => navigation.navigate("NuevaSimulacion"), [navigation]);
+  const goEstadisticas = useCallback(() => navigation.navigate("Estadisticas"), [navigation]);
+  const goHistorial = useCallback(() => navigation.navigate("Historial"), [navigation]);
+  const goCalendario = useCallback(() => navigation.navigate("Calendario"), [navigation]);
+  const goRecomendaciones = useCallback(() => navigation.navigate("Recomendaciones"), [navigation]);
 
   return (
     <View style={[styles.wrapper, { backgroundColor: theme.background }]}>
@@ -14,12 +83,18 @@ export default function Home({ navigation, route }) {
 
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.contentWrapper}>
-          <View style={styles.headerSection}>
-          <Text style={[styles.title, { color: theme.text }]}>Dashboard</Text>
-          <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Hola, {nombreUsuario} 👋</Text>
-        </View>
+          <View style={[styles.headerSection, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+            <View>
+              <Text style={[styles.title, { color: theme.text }]}>Dashboard</Text>
+              <Text style={[styles.subtitle, { color: theme.text }]}>Hola, {nombreUsuario} 👋</Text>
+            </View>
+            <Image 
+              source={fotoPerfil ? { uri: fotoPerfil } : require("../assets/6073873.png")}
+              style={{ width: 50, height: 50, borderRadius: 25, borderWidth: 2, borderColor: theme.primary }}
+            />
+          </View>
 
-        <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate("NuevaSimulacion")}>
+        <TouchableOpacity activeOpacity={0.9} onPress={goSimulacion}>
           <View style={[styles.mainCard, { backgroundColor: theme.primary, shadowColor: theme.primary }]}>
             <Icon name="add-circle" size={48} color="#FFFFFF" style={{ marginBottom: 10 }} />
             <Text style={styles.mainTitle}>Nueva Simulación</Text>
@@ -34,48 +109,34 @@ export default function Home({ navigation, route }) {
             icon="bar-chart"
             title="Estadísticas"
             subtitle="Ver progreso"
-            onPress={() => navigation.navigate("Estadisticas")}
+            onPress={goEstadisticas}
             theme={theme}
           />
           <DashboardCard
             icon="folder-open"
             title="Historial"
             subtitle="Simulaciones"
-            onPress={() => navigation.navigate("Historial")}
+            onPress={goHistorial}
             theme={theme}
           />
           <DashboardCard
             icon="calendar"
             title="Calendario"
             subtitle="Tus fechas"
-            onPress={() => navigation.navigate("Calendario")}
+            onPress={goCalendario}
             theme={theme}
           />
           <DashboardCard
             icon="bulb"
             title="Consejos"
             subtitle="Acción correctiva"
-            onPress={() => navigation.navigate("Recomendaciones")}
+            onPress={goRecomendaciones}
             theme={theme}
           />
           </View>
         </View>
       </ScrollView>
     </View>
-  );
-}
-
-function DashboardCard({ icon, title, subtitle, onPress, theme }) {
-  return (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: theme.card }]}
-      activeOpacity={0.85}
-      onPress={onPress}
-    >
-      <Icon name={icon} size={32} color={theme.primary} style={{ marginBottom: 10 }} />
-      <Text style={[styles.cardTitle, { color: theme.text }]}>{title}</Text>
-      <Text style={[styles.cardSubtitle, { color: theme.textSecondary }]}>{subtitle}</Text>
-    </TouchableOpacity>
   );
 }
 

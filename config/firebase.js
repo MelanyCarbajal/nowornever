@@ -1,5 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBlaEd8tCIo_u6zuW0S4kqecQUu-MCJtCI",
@@ -13,5 +17,17 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-//const analytics = getAnalytics(app);
-export const auth = getAuth(app);
+
+let auth;
+if (Platform.OS === "web") {
+  auth = getAuth(app); // En web, Firebase usa IndexedDB/LocalStorage automáticamente
+} else {
+  // En móviles (iOS/Android), forzamos la persistencia usando AsyncStorage nativo
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage)
+  });
+}
+
+export { auth };
+export const db = getFirestore(app);
+export const storage = getStorage(app);

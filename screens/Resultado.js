@@ -11,14 +11,22 @@ export default function Resultado({ route, navigation }) {
 
   useEffect(() => {
     let value = 0;
+    const frames = 50;
+    const step = horasEfectivas / frames;
+
+    if (horasEfectivas === 0) {
+      setContador(0);
+      return;
+    }
+
     const interval = setInterval(() => {
-      value += 0.1;
+      value += step;
       if (value >= horasEfectivas) {
         value = horasEfectivas;
         clearInterval(interval);
       }
       setContador(value);
-    }, 40);
+    }, 20);
     return () => clearInterval(interval);
   }, [horasEfectivas]);
 
@@ -27,16 +35,16 @@ export default function Resultado({ route, navigation }) {
 
   // Colores dinámicos para estados en modo oscuro/claro
   const getStatusColor = (status) => {
-    if (status.includes("Vas bien")) return isDarkMode ? "#064E3B" : "#DCFCE7";
+    if (status.includes("excelente")) return isDarkMode ? "#064E3B" : "#DCFCE7";
     if (status.includes("justo")) return isDarkMode ? "#713F12" : "#FEF9C3";
-    if (status.includes("Muy")) return isDarkMode ? "#9A3412" : "#FED7AA";
+    if (status.includes("Alto")) return isDarkMode ? "#9A3412" : "#FED7AA";
     return isDarkMode ? "#7F1D1D" : "#FECACA";
   };
 
   const getStatusTextColor = (status) => {
-    if (status.includes("Vas bien")) return isDarkMode ? "#34D399" : "#166534";
+    if (status.includes("excelente")) return isDarkMode ? "#34D399" : "#166534";
     if (status.includes("justo")) return isDarkMode ? "#FDE047" : "#854D0E";
-    if (status.includes("Muy")) return isDarkMode ? "#FDBA74" : "#9A3412";
+    if (status.includes("Alto")) return isDarkMode ? "#FDBA74" : "#9A3412";
     return isDarkMode ? "#FCA5A5" : "#991B1B";
   };
 

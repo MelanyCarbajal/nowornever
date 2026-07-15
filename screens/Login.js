@@ -47,33 +47,27 @@ const handleLogin = async () => {
 
     showMessage("Inicio de sesión correcto", "success");
 
-    // NO navigation.replace("PrivateTabs")
-    // Firebase detectará automáticamente el usuario
-    // gracias a onAuthStateChanged() en App.js
-
   } catch (error) {
-    console.log(error.code);
-
-    Alert.alert(
-      "Error",
-      "Correo o contraseña incorrectos"
-    );
+    if (error.code === "auth/wrong-password") {
+      showMessage("Contraseña mal ingresada", "error");
+    } else if (error.code === "auth/user-not-found") {
+      showMessage("Usuario no encontrado", "error");
+    } else if (error.code === "auth/invalid-credential") {
+      showMessage("Contraseña mal ingresada", "error");
+    } else {
+      showMessage("Error al iniciar sesión", "error");
+    }
   }
 };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
 
-      {message !== "" && (
-        <View
-          style={[
-            styles.toast,
-            { backgroundColor: messageType === "error" ? theme.danger : theme.success },
-          ]}
-        >
+      {message ? (
+        <View style={[styles.toast, { backgroundColor: messageType === "error" ? theme.danger : theme.success }]}>
           <Text style={styles.toastText}>{message}</Text>
         </View>
-      )}
+      ) : null}
 
       <View style={[styles.card, { backgroundColor: theme.card }]}>
         <Text style={[styles.title, { color: theme.text }]}>
