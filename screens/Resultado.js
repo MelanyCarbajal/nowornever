@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from "react-native";
 import { ThemeContext } from "../context/ThemeContext";
 import { Ionicons as Icon } from "@expo/vector-icons";
+import PuntoNoRetornoCard from "../components/PuntoNoRetornoCard";
+
 
 export default function Resultado({ route, navigation }) {
   const { theme, isDarkMode } = useContext(ThemeContext);
-  const { objetivo, diasRestantes, horasEfectivas, riesgo, estado, mensaje } = route.params;
+  const { objetivo, diasRestantes, horasEfectivas, riesgo, estado, mensaje, foto, puntoNoRetorno = null } = route.params;
 
   const [contador, setContador] = useState(0);
 
@@ -35,16 +37,31 @@ export default function Resultado({ route, navigation }) {
 
   // Colores dinámicos para estados en modo oscuro/claro
   const getStatusColor = (status) => {
-    if (status.includes("excelente")) return isDarkMode ? "#064E3B" : "#DCFCE7";
-    if (status.includes("justo")) return isDarkMode ? "#713F12" : "#FEF9C3";
-    if (status.includes("Alto")) return isDarkMode ? "#9A3412" : "#FED7AA";
+
+    if (status.includes("bajo"))
+      return isDarkMode ? "#064E3B" : "#DCFCE7";
+
+    if (status.includes("moderado"))
+      return isDarkMode ? "#713F12" : "#FEF9C3";
+
+    if (status.includes("alto"))
+      return isDarkMode ? "#9A3412" : "#FED7AA";
+
     return isDarkMode ? "#7F1D1D" : "#FECACA";
   };
 
+
   const getStatusTextColor = (status) => {
-    if (status.includes("excelente")) return isDarkMode ? "#34D399" : "#166534";
-    if (status.includes("justo")) return isDarkMode ? "#FDE047" : "#854D0E";
-    if (status.includes("Alto")) return isDarkMode ? "#FDBA74" : "#9A3412";
+
+    if (status.includes("bajo"))
+      return isDarkMode ? "#34D399" : "#166534";
+
+    if (status.includes("moderado"))
+      return isDarkMode ? "#FDE047" : "#854D0E";
+
+    if (status.includes("alto"))
+      return isDarkMode ? "#FDBA74" : "#9A3412";
+
     return isDarkMode ? "#FCA5A5" : "#991B1B";
   };
 
@@ -59,7 +76,32 @@ export default function Resultado({ route, navigation }) {
         </View>
         <Text style={[styles.value, { color: theme.text }]}>{objetivo}</Text>
       </View>
+      {foto && (
+        <View style={[styles.card, { backgroundColor: theme.card }]}>
+          <View style={styles.labelRow}>
+            <Icon
+              name="camera"
+              size={16}
+              color={theme.textSecondary}
+              style={styles.labelIcon}
+            />
 
+            <Text style={[styles.label, { color: theme.textSecondary }]}>
+              Evidencia adjunta
+            </Text>
+          </View>
+
+          <Image
+            source={{ uri: foto }}
+            style={{
+              width: "100%",
+              height: 220,
+              borderRadius: 15,
+              marginTop: 10
+            }}
+          />
+        </View>
+      )}
       <View style={[styles.card, { backgroundColor: theme.card }]}>
         <View style={styles.labelRow}>
           <Icon name="calendar" size={16} color={theme.textSecondary} style={styles.labelIcon} />
@@ -86,9 +128,26 @@ export default function Resultado({ route, navigation }) {
         <Text style={[styles.riesgo, { color: theme.danger }]}>{riesgo.toFixed(0)}%</Text>
       </View>
 
+      {/* PUNTO DE NO RETORNO */}
+      {
+        puntoNoRetorno && (
+
+          <PuntoNoRetornoCard
+            punto={puntoNoRetorno}
+            theme={theme}
+          />
+
+        )
+      }
+
       <View style={[styles.statusCard, { backgroundColor: getStatusColor(estado) }]}>
-        <Text style={[styles.estado, { color: getStatusTextColor(estado) }]}>{estado}</Text>
-        <Text style={[styles.mensaje, { color: getStatusTextColor(estado) }]}>{mensaje}</Text>
+        <Text style={[styles.estado, { color: getStatusTextColor(estado) }]}>
+          {estado}
+        </Text>
+
+        <Text style={[styles.mensaje, { color: getStatusTextColor(estado) }]}>
+          {mensaje}
+        </Text>
       </View>
 
       <TouchableOpacity

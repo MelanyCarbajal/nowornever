@@ -15,6 +15,7 @@ import Button from "../components/Button";
 import { ThemeContext } from "../context/ThemeContext";
 import { auth, db } from "../config/firebase";
 import { doc, setDoc, arrayUnion } from "firebase/firestore";
+import { calcularPuntoNoRetorno } from "../services/puntoNoRetorno";
 
 export default function NuevaSimulacion({ navigation, route = {} }) {
   const foto = route?.params?.foto;
@@ -84,25 +85,46 @@ export default function NuevaSimulacion({ navigation, route = {} }) {
 
     const horasEfectivas = diasRestantes * horasNumero;
 
+    const puntoNoRetorno =
+      calcularPuntoNoRetorno({
+
+        fechaLimite,
+
+        horasNecesarias: horasNumero * 10,
+
+        horasDiarias: horasNumero
+
+      });
     const riesgo = Math.min(100, nivelNumero * 10);
 
     let estado = "";
     let mensaje = "";
 
     if (riesgo <= 30) {
-      estado = "✅ Vas excelente";
-      mensaje = "Tus horas efectivas son más que suficientes. Tienes margen de sobra para cumplir tu objetivo, ¡incluso si te tomas un descanso!";
-    } else if (riesgo <= 60) {
-      estado = "⚠️ Vas justo";
-      mensaje = "Estás a tiempo, pero no te confíes. Si procrastinas un poco más o te distraes, empezarás a estar en peligro de no terminar.";
-    } else if (riesgo <= 80) {
-      estado = "🟠 Alto riesgo";
-      mensaje = "Alerta roja. El tiempo se te agota y tus distracciones te están pasando factura. Tienes que empezar HOY mismo o no llegarás.";
-    } else {
-      estado = "🔴 Punto Crítico";
-      mensaje = "¡Peligro inminente! Matemáticamente, el tiempo ya no te da si sigues a este ritmo. Tienes que eliminar toda distracción de inmediato.";
-    }
 
+      estado = "🟢 Riesgo bajo";
+      mensaje =
+        "Tienes suficiente margen de tiempo para completar tu objetivo.";
+
+    } else if (riesgo <= 60) {
+
+      estado = "🟡 Riesgo moderado";
+      mensaje =
+        "Tu tiempo disponible empieza a reducirse. Mantén una planificación constante.";
+
+    } else if (riesgo <= 80) {
+
+      estado = "🟠 Riesgo alto";
+      mensaje =
+        "Tu margen de tiempo es reducido. Necesitas avanzar pronto para evitar complicaciones.";
+
+    } else {
+
+      estado = "🔴 Riesgo crítico";
+      mensaje =
+        "Tu planificación tiene muy poco margen. Revisa tus tiempos y empieza cuanto antes.";
+
+    }
     const simulacionData = {
       objetivo,
       diasRestantes,
@@ -110,10 +132,13 @@ export default function NuevaSimulacion({ navigation, route = {} }) {
       riesgo,
       estado,
       mensaje,
+      foto,
+      puntoNoRetorno,
       fechaRegistro: new Date().toISOString()
     };
 
     navigation.navigate("Resultado", simulacionData);
+    
 
     // TODO (Notificaciones Autónomas):
     // 1. Aquí se debe calcular matemáticamente el "Punto de No Retorno" (ej. restando las horasEfectivas a la fechaLimite).
@@ -130,7 +155,7 @@ export default function NuevaSimulacion({ navigation, route = {} }) {
     try {
       const user = auth.currentUser;
       if (user) {
-        simulacionData.id = Date.now().toString(); 
+        simulacionData.id = Date.now().toString();
         await setDoc(doc(db, "users", user.uid), {
           simulaciones: arrayUnion(simulacionData)
         }, { merge: true });
@@ -143,7 +168,12 @@ export default function NuevaSimulacion({ navigation, route = {} }) {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.background }}
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[
+        styles.container,
+        {
+          paddingBottom: 120
+        }
+      ]}
       keyboardShouldPersistTaps="handled"
     >
       <View style={[styles.card, { backgroundColor: theme.card }]}>
@@ -299,12 +329,14 @@ export default function NuevaSimulacion({ navigation, route = {} }) {
           </View>
         )}
 
-        {/* BOTÓN SIMULAR */}
-        <Button 
-          title="Calcular Escenario" 
-          onPress={handleSimular} 
-          disabled={guardando}
-        />
+        <View style={{ marginBottom: 20 }}>
+          {/* BOTÓN SIMULAR */}
+          <Button
+            title="Calcular Escenario"
+            onPress={handleSimular}
+            disabled={guardando}
+          />
+        </View>
       </View>
     </ScrollView>
   );
@@ -313,6 +345,7 @@ export default function NuevaSimulacion({ navigation, route = {} }) {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    paddingBottom: 40,
     alignItems: "stretch",
   },
   card: {

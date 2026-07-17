@@ -6,199 +6,440 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons as Icon } from "@expo/vector-icons";
-
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./config/firebase";
-
-import { ThemeProvider, ThemeContext } from "./context/ThemeContext";
+import { ThemeProvider, ThemeContext} from "./context/ThemeContext";
 import { TimerProvider } from "./context/TimerContext";
 import { registrarForPushNotificationsAsync } from "./services/notificationService";
+
+
+// Screens
 
 import Inicio from "./screens/Inicio";
 import Login from "./screens/Login";
 import Registro from "./screens/Registro";
+
 import Home from "./screens/Home";
 import Perfil from "./screens/Perfil";
+
 import NuevaSimulacion from "./screens/NuevaSimulacion";
-import Recomendaciones from "./screens/Recomendaciones";
+import CamaraEvidencia from "./screens/CamaraEvidencia";
 import Resultado from "./screens/Resultado";
-import Estadisticas from "./screens/Estadisticas";
+
+import Recomendaciones from "./screens/Recomendaciones";
+
 import Historial from "./screens/Historial";
+import Estadisticas from "./screens/Estadisticas";
 import Configuracion from "./screens/Configuracion";
 import Calendario from "./screens/Calendario";
+
 import AcercaDe from "./screens/AcercaDe";
-import CamaraEvidencia from "./screens/CamaraEvidencia";
-import CustomTabBar from "./components/CustomTabBar";
+import EditarPerfil from "./screens/EditarPerfil";
+
 import TestProcrastinacion from "./screens/TestProcrastinacion";
 import ResultadoTest from "./screens/ResultadoTest";
+
+import CustomTabBar from "./components/CustomTabBar";
+
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-/* =========================
-   HOME STACK
-========================= */
-function HomeStack() {
-  const { theme } = useContext(ThemeContext);
+
+
+
+/*
+=========================
+ HOME STACK
+=========================
+*/
+
+function HomeStack(){
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="HomeMain" component={Home} />
-      <Stack.Screen name="Resultado" component={Resultado} />
-      <Stack.Screen name="Historial" component={Historial} />
-      <Stack.Screen name="Estadisticas" component={Estadisticas} />
-      <Stack.Screen name="Calendario" component={Calendario} />
+
+    <Stack.Navigator
+      screenOptions={{
+        headerShown:false
+      }}
+    >
+
+      <Stack.Screen
+        name="HomeMain"
+        component={Home}
+      />
+
+
+      <Stack.Screen
+        name="Historial"
+        component={Historial}
+      />
+
+
+      <Stack.Screen
+        name="Estadisticas"
+        component={Estadisticas}
+      />
+
+
+      <Stack.Screen
+        name="Calendario"
+        component={Calendario}
+      />
+
+
     </Stack.Navigator>
+
   );
+
+}
+/*
+=========================
+ PERFIL STACK
+=========================
+*/
+
+function PerfilStack(){
+
+  return (
+
+    <Stack.Navigator
+      screenOptions={{
+        headerShown:false
+      }}
+    >
+
+
+      <Stack.Screen
+        name="PerfilMain"
+        component={Perfil}
+      />
+
+
+      <Stack.Screen
+        name="EditarPerfil"
+        component={EditarPerfil}
+      />
+
+
+      <Stack.Screen
+        name="Configuracion"
+        component={Configuracion}
+      />
+
+
+      <Stack.Screen
+        name="AcercaDe"
+        component={AcercaDe}
+      />
+
+
+      <Stack.Screen
+        name="Estadisticas"
+        component={Estadisticas}
+      />
+
+
+      <Stack.Screen
+        name="Historial"
+        component={Historial}
+      />
+
+
+    </Stack.Navigator>
+
+  );
+
 }
 
-/* =========================
-   PERFIL STACK
-========================= */
-import EditarPerfil from "./screens/EditarPerfil";
+/*
+=========================
+ TABS
+=========================
+*/
 
-function PerfilStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="PerfilMain" component={Perfil} />
-      <Stack.Screen name="EditarPerfil" component={EditarPerfil} />
-      <Stack.Screen name="Configuracion" component={Configuracion} />
-      <Stack.Screen name="AcercaDe" component={AcercaDe} />
-      <Stack.Screen name="Estadisticas" component={Estadisticas} />
-      <Stack.Screen name="Historial" component={Historial} />
-    </Stack.Navigator>
-  );
-}
-
-/* =========================
-   TABS
-========================= */
-function PrivateTabs() {
-  const { theme } = useContext(ThemeContext);
+function PrivateTabs(){
 
   return (
+
     <Tab.Navigator
+
+
       tabBar={
         USE_CUSTOM_NAVBAR
-          ? (props) => <CustomTabBar {...props} />
-          : undefined
+        ?
+        (props)=>
+        <CustomTabBar {...props}/>
+        :
+        undefined
       }
-      screenOptions={({ route }) => ({
-        headerShown: false,
-      })}
+
+
+      screenOptions={{
+        headerShown:false
+      }}
+
     >
       <Tab.Screen
+
         name="Home"
+
         component={HomeStack}
-        options={{ tabBarLabel: "Inicio" }}
-      />
 
-      <Tab.Screen
-        name="NuevaSimulacion"
-        component={NuevaSimulacion}
-        options={{ tabBarLabel: "Simular" }}
-      />
-
-      <Tab.Screen
-        name="Recomendaciones"
-        component={Recomendaciones}
-        options={{ tabBarLabel: "Consejos" }}
-      />
-
-      <Tab.Screen
-        name="Perfil"
-        component={PerfilStack}
-        options={{ tabBarLabel: "Perfil" }}
-      />
-      <Tab.Screen
-        name="Test"
-        component={TestProcrastinacion}
         options={{
-          tabBarLabel: "Test",
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="clipboard-outline" size={size} color={color} />
-          )
+          tabBarLabel:"Inicio"
         }}
+
       />
+
+      <Tab.Screen
+
+        name="NuevaSimulacion"
+
+        component={NuevaSimulacion}
+
+        options={{
+          tabBarLabel:"Simular"
+        }}
+
+      />
+
+      <Tab.Screen
+
+        name="Recomendaciones"
+
+        component={Recomendaciones}
+
+        options={{
+          tabBarLabel:"Consejos"
+        }}
+
+      />
+
+      <Tab.Screen
+
+        name="Perfil"
+
+        component={PerfilStack}
+
+        options={{
+          tabBarLabel:"Perfil"
+        }}
+
+      />
+
+      <Tab.Screen
+
+        name="Test"
+
+        component={TestProcrastinacion}
+
+        options={{
+
+          tabBarLabel:"Test",
+
+          tabBarIcon:({
+            color,
+            size
+          })=>(
+
+            <Icon
+              name="clipboard-outline"
+              size={size}
+              color={color}
+            />
+
+          )
+
+        }}
+
+      />
+
+
     </Tab.Navigator>
+
   );
+
 }
 
-/* =========================
-   AUTH STACK
-========================= */
-function AuthStack() {
+/*
+=========================
+ AUTH STACK
+=========================
+*/
+
+function AuthStack(){
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {/* Login ahora es la pantalla principal/inicial */}
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Inicio" component={Inicio} />
-      <Stack.Screen name="Registro" component={Registro} />
+
+    <Stack.Navigator
+
+      screenOptions={{
+        headerShown:false
+      }}
+
+    >
+
+      <Stack.Screen
+        name="Login"
+        component={Login}
+      />
+
+
+      <Stack.Screen
+        name="Inicio"
+        component={Inicio}
+      />
+
+
+      <Stack.Screen
+        name="Registro"
+        component={Registro}
+      />
+
     </Stack.Navigator>
+
   );
+
 }
 
-/* =========================
-   APP STACK 
-========================= */
-function AppStack() {
+/*
+=========================
+ APP STACK
+=========================
+*/
+
+function AppStack(){
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown:false
+      }}
 
-      {/* TABS PRINCIPALES */}
-      <Stack.Screen name="Tabs" component={PrivateTabs} />
+    >
 
-      {/* PANTALLAS GLOBALES (IMPORTANTE) */}
-      <Stack.Screen name="NuevaSimulacion" component={NuevaSimulacion} />
-      <Stack.Screen name="Resultado" component={Resultado} />
-      <Stack.Screen name="CamaraEvidencia" component={CamaraEvidencia} />
-      <Stack.Screen name="TestProcrastinacion" component={TestProcrastinacion} />
-      <Stack.Screen name="ResultadoTest" component={ResultadoTest} />
+      {/* Pantallas principales con tabs */}
 
+      <Stack.Screen
+
+        name="Tabs"
+
+        component={PrivateTabs}
+
+      />
+
+      {/* Pantallas encima de tabs */}
+
+      <Stack.Screen
+
+        name="Resultado"
+
+        component={Resultado}
+
+      />
+      <Stack.Screen
+
+        name="CamaraEvidencia"
+
+        component={CamaraEvidencia}
+
+      />
+      <Stack.Screen
+        name="ResultadoTest"
+
+        component={ResultadoTest}
+
+      />
     </Stack.Navigator>
+
   );
+
 }
 
-/* =========================
-   MAIN
-========================= */
-function MainNavigation() {
-  const { isDarkMode } = useContext(ThemeContext);
+/*
+=========================
+ MAIN NAVIGATION
+=========================
+*/
 
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+function MainNavigation(){
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-      if (currentUser) {
-        registrarForPushNotificationsAsync().catch(console.log);
+  const {
+    isDarkMode
+  } = useContext(ThemeContext);
+
+  const [
+    user,
+    setUser
+  ] = useState(null);
+
+  const [
+    loading,
+    setLoading
+  ] = useState(true);
+
+  useEffect(()=>{
+
+    const unsubscribe =
+    onAuthStateChanged(
+      auth,
+      (currentUser)=>{
+        setUser(currentUser);
+        setLoading(false);
+        if(currentUser){
+          registrarForPushNotificationsAsync()
+          .catch(console.log);
+
+        }
+
       }
-    });
+
+    );
 
     return unsubscribe;
-  }, []);
 
-  if (loading) return null;
+  },[]);
+
+  if(loading)
+    return null;
 
   return (
+
     <NavigationContainer>
-      <StatusBar style={isDarkMode ? "light" : "dark"} />
-      {user ? <AppStack /> : <AuthStack />}
+      <StatusBar
+
+        style={
+          isDarkMode
+          ?
+          "light"
+          :
+          "dark"
+        }
+
+      />
+      {
+        user
+        ?
+        <AppStack/>
+        :
+        <AuthStack/>
+      }
     </NavigationContainer>
+
   );
+
 }
 
-/* =========================
-   APP
-========================= */
-export default function App() {
+export default function App(){
   return (
     <ThemeProvider>
       <TimerProvider>
-        <MainNavigation />
+        <MainNavigation/>
       </TimerProvider>
     </ThemeProvider>
+
   );
+
 }

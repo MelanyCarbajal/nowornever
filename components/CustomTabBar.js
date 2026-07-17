@@ -11,13 +11,13 @@ const CustomTabBar = memo(({ state, descriptors, navigation }) => {
       <View style={[styles.container, { backgroundColor: theme.card }]}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
-          
+
           const label =
             options.tabBarLabel !== undefined
               ? options.tabBarLabel
               : options.title !== undefined
-              ? options.title
-              : route.name;
+                ? options.title
+                : route.name;
 
           const isFocused = state.index === index;
 
@@ -34,9 +34,11 @@ const CustomTabBar = memo(({ state, descriptors, navigation }) => {
           };
 
           let iconName = "home";
+
           if (route.name === "NuevaSimulacion") iconName = "add-circle";
           if (route.name === "Recomendaciones") iconName = "bulb";
           if (route.name === "Perfil") iconName = "person";
+          if (route.name === "Test") iconName = "clipboard";
 
           return (
             <TouchableOpacity
@@ -48,14 +50,14 @@ const CustomTabBar = memo(({ state, descriptors, navigation }) => {
               onPress={onPress}
               activeOpacity={0.8}
               style={[
-                styles.tabBtn, 
+                styles.tabBtn,
                 isFocused && { backgroundColor: isDarkMode ? theme.primary + "30" : theme.primary + "15" }
               ]}
             >
-              <Icon 
-                name={isFocused ? iconName : `${iconName}-outline`} 
-                size={22} 
-                color={isFocused ? theme.primary : theme.textSecondary} 
+              <Icon
+                name={isFocused ? iconName : `${iconName}-outline`}
+                size={22}
+                color={isFocused ? theme.primary : theme.textSecondary}
               />
               {isFocused && (
                 <Text style={[styles.tabLabel, { color: theme.primary }]}>

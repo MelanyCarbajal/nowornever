@@ -26,7 +26,7 @@ export default function Estadisticas({ navigation }) {
       }
     });
 
-    const unsubscribe = onSnapshot(doc(db, "users", user.uid), 
+    const unsubscribe = onSnapshot(doc(db, "users", user.uid),
       (docSnap) => {
         if (docSnap.exists() && docSnap.data().simulaciones) {
           const docs = docSnap.data().simulaciones;
@@ -38,7 +38,7 @@ export default function Estadisticas({ navigation }) {
           setData([]);
           setLoading(false);
         }
-      }, 
+      },
       (err) => {
         console.error("Error cargando estadísticas", err);
         if (data.length === 0) setError(true);
@@ -78,25 +78,33 @@ export default function Estadisticas({ navigation }) {
   const seguros = data.filter((item) => item.riesgo < 60).length;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.container,
+    { backgroundColor: theme.background }
+  ]}
+      contentContainerStyle={[
+        styles.scrollContent,
+        { backgroundColor: theme.background }
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.contentWrapper}>
         <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={[styles.backBtn, { backgroundColor: theme.primary }]}
-        activeOpacity={0.8}>
-        <Icon name="arrow-back" size={20} color="#FFFFFF" style={{ marginRight: 6 }} />
-        <Text style={styles.backText}>Volver</Text>
-      </TouchableOpacity>
-      
-      <Text style={[styles.title, { color: theme.text }]}>Estadísticas</Text>
+          onPress={() => navigation.goBack()}
+          style={[styles.backBtn, { backgroundColor: theme.primary }]}
+          activeOpacity={0.8}>
+          <Icon name="arrow-back" size={20} color="#FFFFFF" style={{ marginRight: 6 }} />
+          <Text style={styles.backText}>Volver</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.mainCard, { backgroundColor: theme.primary, shadowColor: theme.primary }]} activeOpacity={0.85}>
-        <Text style={styles.mainLabel}>Simulaciones realizadas</Text>
-        <Text style={styles.mainValue}>{data.length}</Text>
-        <Text style={styles.subText}>Sigue mejorando tu productividad 🚀</Text>
-      </TouchableOpacity>
+        <Text style={[styles.title, { color: theme.text }]}>Estadísticas</Text>
 
-      {/* 
+        <TouchableOpacity style={[styles.mainCard, { backgroundColor: theme.primary, shadowColor: theme.primary }]} activeOpacity={0.85}>
+          <Text style={styles.mainLabel}>Simulaciones realizadas</Text>
+          <Text style={styles.mainValue}>{data.length}</Text>
+          <Text style={styles.subText}>Sigue mejorando tu productividad 🚀</Text>
+        </TouchableOpacity>
+
+        {/* 
         TODO (Gamificación - Sistema de Castigos): 
         1. Agregar aquí un componente de "Energía" o "Nivel de Disciplina" (ej. Barra de vida).
         2. Esa variable debe venir de Firebase (ej. user.disciplina).
@@ -104,52 +112,52 @@ export default function Estadisticas({ navigation }) {
         4. Si el nivel de disciplina llega a 0%, cambiar el color principal a rojo o bloquear la app temporalmente.
       */}
 
-      <View style={styles.grid}>
-        {/* PROMEDIO */}
-        <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#1E3A8A" : "#DBEAFE" }]}>
-          <Icon name="trending-up" size={28} color={isDarkMode ? "#60A5FA" : "#1D4ED8"} style={styles.statIcon} />
-          <Text style={[styles.blueNumber, { color: isDarkMode ? "#60A5FA" : "#1D4ED8" }]}>{promedio}%</Text>
-          <Text style={[styles.statLabel, { color: theme.text }]}>Riesgo promedio</Text>
+        <View style={styles.grid}>
+          {/* PROMEDIO */}
+          <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#1E3A8A" : "#DBEAFE" }]}>
+            <Icon name="trending-up" size={28} color={isDarkMode ? "#60A5FA" : "#1D4ED8"} style={styles.statIcon} />
+            <Text style={[styles.blueNumber, { color: isDarkMode ? "#60A5FA" : "#1D4ED8" }]}>{promedio}%</Text>
+            <Text style={[styles.statLabel, { color: theme.text }]}>Riesgo promedio</Text>
+          </View>
+
+          {/* CRITICOS */}
+          <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#7F1D1D" : "#FEE2E2" }]}>
+            <Icon name="flame" size={28} color={isDarkMode ? "#FCA5A5" : "#DC2626"} style={styles.statIcon} />
+            <Text style={[styles.redNumber, { color: isDarkMode ? "#FCA5A5" : "#DC2626" }]}>{criticos}</Text>
+            <Text style={[styles.statLabel, { color: theme.text }]}>Escenarios críticos</Text>
+          </View>
+
+          {/* MODERADOS */}
+          <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#713F12" : "#FEF3C7" }]}>
+            <Icon name="warning" size={28} color={isDarkMode ? "#FDE047" : "#D97706"} style={styles.statIcon} />
+            <Text style={[styles.yellowNumber, { color: isDarkMode ? "#FDE047" : "#D97706" }]}>{moderados}</Text>
+            <Text style={[styles.statLabel, { color: theme.text }]}>Escenarios moderados</Text>
+          </View>
+
+          {/* SEGUROS */}
+          <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#064E3B" : "#DCFCE7" }]}>
+            <Icon name="checkmark-circle" size={28} color={isDarkMode ? "#34D399" : "#16A34A"} style={styles.statIcon} />
+            <Text style={[styles.greenNumber, { color: isDarkMode ? "#34D399" : "#16A34A" }]}>{seguros}</Text>
+            <Text style={[styles.statLabel, { color: theme.text }]}>Escenarios seguros</Text>
+          </View>
         </View>
 
-        {/* CRITICOS */}
-        <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#7F1D1D" : "#FEE2E2" }]}>
-          <Icon name="flame" size={28} color={isDarkMode ? "#FCA5A5" : "#DC2626"} style={styles.statIcon} />
-          <Text style={[styles.redNumber, { color: isDarkMode ? "#FCA5A5" : "#DC2626" }]}>{criticos}</Text>
-          <Text style={[styles.statLabel, { color: theme.text }]}>Escenarios críticos</Text>
+        <View style={[styles.tipCard, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+            <Icon name="bulb" size={24} color={theme.warning} style={{ marginRight: 8 }} />
+            <Text style={[styles.tipTitle, { color: theme.text }]}>Recomendación</Text>
+          </View>
+          <Text style={[styles.tipText, { color: theme.textSecondary }]}>
+            {promedio < 40
+              ? "Excelente organización. Mantienes un riesgo bastante bajo."
+              : promedio < 60
+                ? "Tu productividad es estable. Sigue manteniendo tus horarios."
+                : promedio < 85
+                  ? "Tus simulaciones muestran presión moderada. Organiza mejor tus tiempos."
+                  : "Nivel de riesgo elevado. Reduce carga o aumenta horas disponibles."}
+          </Text>
         </View>
-
-        {/* MODERADOS */}
-        <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#713F12" : "#FEF3C7" }]}>
-          <Icon name="warning" size={28} color={isDarkMode ? "#FDE047" : "#D97706"} style={styles.statIcon} />
-          <Text style={[styles.yellowNumber, { color: isDarkMode ? "#FDE047" : "#D97706" }]}>{moderados}</Text>
-          <Text style={[styles.statLabel, { color: theme.text }]}>Escenarios moderados</Text>
-        </View>
-
-        {/* SEGUROS */}
-        <View style={[styles.statCard, { backgroundColor: isDarkMode ? "#064E3B" : "#DCFCE7" }]}>
-          <Icon name="checkmark-circle" size={28} color={isDarkMode ? "#34D399" : "#16A34A"} style={styles.statIcon} />
-          <Text style={[styles.greenNumber, { color: isDarkMode ? "#34D399" : "#16A34A" }]}>{seguros}</Text>
-          <Text style={[styles.statLabel, { color: theme.text }]}>Escenarios seguros</Text>
-        </View>
-      </View>
-
-      <View style={[styles.tipCard, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
-        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
-          <Icon name="bulb" size={24} color={theme.warning} style={{ marginRight: 8 }} />
-          <Text style={[styles.tipTitle, { color: theme.text }]}>Recomendación</Text>
-        </View>
-        <Text style={[styles.tipText, { color: theme.textSecondary }]}>
-          {promedio < 40
-            ? "Excelente organización. Mantienes un riesgo bastante bajo."
-            : promedio < 60
-              ? "Tu productividad es estable. Sigue manteniendo tus horarios."
-              : promedio < 85
-                ? "Tus simulaciones muestran presión moderada. Organiza mejor tus tiempos."
-                : "Nivel de riesgo elevado. Reduce carga o aumenta horas disponibles."}
-        </Text>
-      </View>
-      <View style={{ height: 40 }} />
+        <View style={{ height: 40 }} />
       </View>
     </ScrollView>
   );
